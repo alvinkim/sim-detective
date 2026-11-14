@@ -1,0 +1,116 @@
+# sim-detective default configuration (spec SIMDET-AGENT-SPEC-001)
+
+cell:                       # 5.2 nominal parameters
+  q_ah: 50.0                # Ah
+  ocv0: 3.30                # V
+  k_ocv: 0.80               # V per unit SOC
+  r0_ref: 3.0e-3            # ohm
+  alpha: 0.03               # 1/K
+  t_ref: 298.15             # K
+  r1: 1.0e-3                # ohm
+  tau1: 30.0                # s
+  tau2: 300.0               # s
+  c_th: 1000.0              # J/K
+  h_th: 0.556               # W/K (thermal time constant ~1800 s)
+  t_amb: 298.15             # K
+  sigma_v: 1.0e-3           # V
+  sigma_t: 0.1              # K
+
+sim:
+  soc_init: 0.75            # SOC the twin believes at the start of every segment
+  soc_min: 0.2
+  soc_max: 0.8
+
+regimes:                    # 5.6
+  CC:
+    current_a: 25.0
+    pre_s: 1200             # run before the logged window (not shown to the agent)
+    observe_s: 1200
+  DYN:
+    steps:                  # [current_a, duration_s]
+      - [0, 600]
+      - [25, 600]
+      - [0, 900]
+      - [50, 30]
+      - [0, 120]
+      - [50, 30]
+      - [0, 120]
+      - [50, 30]
+      - [0, 120]
+      - [10, 600]
+      - [0, 5400]
+
+faults:                     # 5.5
+  calibration_current_a: 25.0
+  target_shift_v:
+    small: 0.008
+    large: 0.016
+  noise_mult:
+    small: 2.0
+    large: 4.0
+
+oracle:                     # 6.2 (initial values; change history goes to scenarios/GENERATION_REPORT.md)
+  rms_mode: max_channel     # max_channel: worse of the V and T channel; pooled: RMS over both together
+  consistent_max: 1.15
+  clear_reject_min: 1.50
+  noise_ratio_min: 1.5
+
+experiments:                # 6.3
+  max_per_episode: 2
+  soc_margin: 0.05          # a request is refused if coulomb-counted SOC would leave [soc_min+margin, soc_max-margin]
+  menu:
+    pulse_test:
+      amplitude_a: [1, 50]
+      duration_s: [10, 120]
+    rest_test:
+      duration_s: [600, 7200]
+    cc_run:
+      current_a: [1, 25]
+      duration_s: [60, 1800]
+  pulse_pre_rest_s: 60
+  pulse_post_rest_s: 300
+  representative:
+    pulse_test:
+      - {amplitude_a: 10, duration_s: 30}
+      - {amplitude_a: 25, duration_s: 60}
+      - {amplitude_a: 50, duration_s: 120}
+    rest_test:
+      - {duration_s: 600}
+      - {duration_s: 1800}
+      - {duration_s: 5400}
+    cc_run:
+      - {current_a: 5, duration_s: 600}
+      - {current_a: 15, duration_s: 1200}
+      - {current_a: 25, duration_s: 900}
+
+scenario:                   # 7
+  max_rows: 240
+  edge_samples: 3
+  max_attempts: 5           # seeds tried per scenario slot before giving up
+  plan:                     # 7.1: count per regime and cause
+    DYN: {H: 4, N: 4, R0: 6, SOC0: 6, TB: 6, ST: 6}
+    CC: {H: 2, N: 2, R0: 6, SOC0: 6, TB: 6, ST: 6}
+
+agent:                      # 8
+  prompt_version: v1
+  models: [claude-haiku-5-5, claude-sonnet-5-5]
+  max_tokens: 16000
+  effort: medium            # sent as output_config.effort to every model; null = API default per model
+  max_calls_per_episode: 8
+  budget_usd: 50.0
+  max_retries: 5            # 429 / 5xx, exponential backoff
+  backoff_base_s: 2.0
+  pricing_usd_per_mtok:     # first-party list prices; check before a real run
+    claude-haiku-5-5: {input: 0.10, output: 0.50}     # prompts up to 100K tokens
+    claude-sonnet-5-5: {input: 2.00, output: 10.00}
+  cache_write_multiplier: 1.25
+  cache_read_multiplier: 0.10
+  estimate:                 # only for the pre-run cost estimate; measure in the pilot
+    chars_per_token: 3.0
+    output_tokens_per_call: 2500
+    calls_per_episode: {A: 1.1, B: 3.2}
+
+stats:                      # 9.4
+  bootstrap_n: 10000
+  seed: 0
+  confidence_bins: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]

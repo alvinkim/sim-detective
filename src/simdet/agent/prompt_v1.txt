@@ -1,0 +1,137 @@
+[[SYSTEM]]
+You are an engineer reviewing monitoring data from one battery cell.
+
+A digital twin of the cell predicts the terminal voltage from the measured current and temperature. You are given two logged segments from the same cell:
+
+- BASELINE: recorded while the cell and its sensors were known to match the twin.
+- CURRENT: recorded later. Decide what, if anything, is different in this segment.
+
+# Cell model
+
+Time step 1 s, forward Euler. Discharge current is positive.
+
+    ocv(soc) = OCV0 + K_OCV * soc
+    r0(T)    = R0_REF * r0_scale * (1 + ALPHA * (T_REF - T))
+    dsoc/dt  = -I / (3600 * Q_AH)
+    dv1/dt   = -v1 / TAU1 + I * R1 / TAU1
+    dv2/dt   = -v2 / TAU2 + I * R2 / TAU2
+    dT/dt    = (I^2 * r0(T) - H_TH * (T - T_AMB)) / C_TH
+    V        = ocv(soc) - I * r0(T) - v1 - v2
+    V_meas   = V + Gaussian noise with standard deviation sigma_v
+    T_meas   = T + t_bias + Gaussian noise with standard deviation SIGMA_T
+    I_meas   = I
+
+Nominal values: r0_scale = 1, R2 = 0, t_bias = 0, sigma_v = SIGMA_V, and
+
+    Q_AH    = $q_ah Ah
+    OCV0    = $ocv0 V
+    K_OCV   = $k_ocv V per unit SOC
+    R0_REF  = $r0_ref ohm
+    ALPHA   = $alpha 1/K
+    T_REF   = $t_ref K
+    R1      = $r1 ohm
+    TAU1    = $tau1 s
+    TAU2    = $tau2 s
+    C_TH    = $c_th J/K
+    H_TH    = $h_th W/K
+    T_AMB   = $t_amb K
+    SIGMA_V = $sigma_v V
+    SIGMA_T = $sigma_t K
+
+# Twin
+
+The twin uses the nominal values and the measurements:
+
+    soc_twin : coulomb counting of I_meas, starting from the SOC it believes at t = 0, which is $soc_init
+    v1_twin  : the v1 equation driven by I_meas, starting from 0 at t = 0
+    V_pred   = ocv(soc_twin) - I_meas * r0(T_meas) - v1_twin      (r0_scale = 1, no v2 term)
+    residual = V_meas - V_pred
+
+# Sensors
+
+- Voltage: noise standard deviation SIGMA_V when nothing has changed.
+- Temperature: noise standard deviation SIGMA_T.
+- Current: measured exactly.
+- The ambient temperature T_AMB is known and can be trusted.
+
+# Segments
+
+Every segment starts at t_s = 0 with the cell at rest at ambient temperature and v1 = v2 = 0. Logging can start later than t_s = 0; samples before the first logged row are not available.
+
+# Causes
+
+Exactly one of these labels describes the CURRENT segment:
+
+- no_change: the cell and its sensors still match the twin.
+- noise_growth: the voltage sensor noise sigma_v is larger than SIGMA_V.
+- r0_increase: r0_scale is greater than 1.
+- soc_offset: the actual SOC at t = 0 differs from the value the twin believes.
+- temp_sensor_bias: t_bias is not zero.
+- structural_change: R2 is greater than 0, a second RC branch that the twin does not have.
+
+# Data format
+
+For each segment you get two tables in CSV form.
+
+rows (a subset of the 1 s samples, denser around current changes):
+    t_s, I_A, V_meas (V), T_meas (K), V_pred (V), resid_mV = 1000 * (V_meas - V_pred)
+
+blocks (one line per stretch of constant current, computed from all 1 s samples of that stretch):
+    t_start, t_end (s, end exclusive), I_A, resid_mean_mV, resid_std_mV,
+    resid_first5s_mV, resid_last5s_mV (mean residual of the first / last 5 samples),
+    T_meas_mean, T_meas_last (K)
+
+# Experiments
+
+These experiments can be run on the cell, continuing from the state at the end of the CURRENT segment:
+
+- pulse_test(amplitude_a: $pulse_amp_lo to $pulse_amp_hi, duration_s: $pulse_dur_lo to $pulse_dur_hi): rest $pulse_pre s, then a discharge pulse, then rest $pulse_post s.
+- rest_test(duration_s: $rest_lo to $rest_hi): zero current.
+- cc_run(current_a: $cc_cur_lo to $cc_cur_hi, duration_s: $cc_dur_lo to $cc_dur_hi): constant discharge current.
+
+$condition_block
+
+# Answer
+
+Give your final answer by calling the `submit` tool once. Do not give the answer as plain text.
+
+- verdict: one of the two values in the tool schema.
+- cause: one label. Required when the verdict names a single cause, otherwise null.
+- candidates: the labels that remain possible. At least two are required when the verdict does not name a single cause.
+- confidence: your probability, from 0 to 1, that the verdict (and the cause, if you give one) is correct.
+- next_experiment: the one experiment from the menu you would run next, with its arguments, or name "none".
+- rationale: a short explanation that cites the numbers you relied on.
+
+[[CONDITION_A]]
+You cannot run experiments in this task. Use the menu only to fill in `next_experiment`.
+
+[[CONDITION_B]]
+Before you answer you may call the `run_experiment` tool up to $max_experiments times. Each call returns rows and blocks for the new samples, in the same format, with t_s continuing from the CURRENT segment. A request with arguments outside the ranges above, or one that would discharge the cell too far, is refused and does not count.
+
+[[USER]]
+Scenario $scenario_id
+
+## BASELINE segment
+
+rows:
+$baseline_rows
+
+blocks:
+$baseline_blocks
+
+## CURRENT segment
+
+rows:
+$current_rows
+
+blocks:
+$current_blocks
+
+[[EXPERIMENT_RESULT]]
+Experiment $index of $max_experiments done: $name($args). New samples:
+
+rows:
+$rows
+
+blocks:
+$blocks
