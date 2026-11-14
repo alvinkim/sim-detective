@@ -105,6 +105,36 @@ def paired_bootstrap_diff(
             "lo": float(lo), "hi": float(hi), "n": len(ids)}
 
 
+def cluster_bootstrap(
+    pairs: dict[str, tuple[float, float]],
+    cluster_of: dict[str, tuple],
+    n_boot: int = 10_000,
+    seed: int = 0,
+) -> dict:
+    """Interval for a rate when whole designs (clusters of scenarios) are resampled.
+    Scenarios of one (regime, cause, size) design differ only by noise, so this is the
+    interval to quote when they should not count as independent."""
+    sums: dict[tuple, list[float]] = defaultdict(lambda: [0.0, 0.0])
+    for sid, (num, den) in pairs.items():
+        sums[cluster_of[sid]][0] += num
+        sums[cluster_of[sid]][1] += den
+    arr = np.array([v for v in sums.values() if v[1] > 0])
+    if len(arr) < 2:
+        return {"lo": None, "hi": None, "clusters": len(arr)}
+    rng = np.random.default_rng(seed)
+    s = arr[rng.integers(0, len(arr), size=(n_boot, len(arr)))].sum(axis=1)
+    lo, hi = np.percentile(s[:, 0] / s[:, 1], [2.5, 97.5])
+    return {"lo": float(lo), "hi": float(hi), "clusters": len(arr)}
+
+
+def brier(episodes: list[dict]) -> float | None:
+    """Mean squared gap between stated confidence and being right (0 is best)."""
+    gaps = [(e["grade"]["confidence"] - (e["grade"]["verdict"] in ("correct", "correct_abstain"))) ** 2
+            for e in episodes
+            if e["grade"]["verdict"] not in ("invalid", "ungraded") and e["grade"]["confidence"] is not None]
+    return sum(gaps) / len(gaps) if gaps else None
+
+
 def calibration(episodes: list[dict], edges: list[float]) -> list[dict]:
     """Per confidence bin: episodes, mean confidence, share judged correct or
     correct_abstain. Invalid and ungraded episodes are left out."""

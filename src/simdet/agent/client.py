@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import random
+import threading
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -45,6 +46,8 @@ def _sdk_send(max_retries: int, backoff_base_s: float, sleep: Callable[[float], 
         }
         if request.get("effort"):
             kwargs["output_config"] = {"effort": request["effort"]}
+        if request.get("thinking_display"):
+            kwargs["thinking"] = {"type": "adaptive", "display": request["thinking_display"]}
         for attempt in range(max_retries + 1):
             try:
                 raw = sdk.messages.create(**kwargs).to_dict()
@@ -82,6 +85,7 @@ class ClaudeClient:
         self.model = model
         self.max_tokens = int(agent["max_tokens"])
         self.effort = agent.get("effort")
+        self.thinking_display = agent.get("thinking_display")
         self.price = agent["pricing_usd_per_mtok"][model]
         self.cache_dir = Path(cache_dir)
         self.budget = budget or Budget(float(agent["budget_usd"]))
@@ -101,6 +105,7 @@ class ClaudeClient:
             "model": self.model,
             "max_tokens": self.max_tokens,
             "effort": self.effort,
+            "thinking_display": self.thinking_display,
             "system": system,
             "messages": messages,
             "tools": tools,
@@ -114,7 +119,9 @@ class ClaudeClient:
             return {**stored, "cached": True, "cost_usd": 0.0, "request_sha": key}
 
         self.budget.check()
+        started = time.perf_counter()
         raw = self._send(request)
+        elapsed = time.perf_counter() - started
         usage = {k: (raw.get("usage") or {}).get(k) or 0 for k in USAGE_KEYS}
         response = {
             "model": raw.get("model", self.model),
@@ -123,9 +130,10 @@ class ClaudeClient:
             "usage": usage,
             "list_cost_usd": self.cost_of(usage),
             "retries": raw.get("_retries", 0),
+            "elapsed_s": round(elapsed, 3),
         }
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_suffix(".tmp")
+        tmp = path.with_suffix(f".{threading.get_ident()}.tmp")
         with open(tmp, "w", encoding="utf-8") as f:
             json.dump(response, f, ensure_ascii=False)
         os.replace(tmp, path)
@@ -139,9 +147,11 @@ class Budget:
     def __init__(self, limit_usd: float):
         self.limit_usd = limit_usd
         self.spent_usd = 0.0
+        self._lock = threading.Lock()
 
     def add(self, cost: float) -> None:
-        self.spent_usd += cost
+        with self._lock:
+            self.spent_usd += cost
 
     def check(self) -> None:
         if self.spent_usd > self.limit_usd:

@@ -80,15 +80,74 @@ def breakdown_rows(groups: dict) -> list[list]:
     return rows
 
 
+IDENTIFIABLE_METRICS = ("accuracy", "accuracy_no_tb", "over_abstain", "over_abstain_no_cc_small_r0")
+
+
+def _design_of(episodes: list[dict]) -> dict[str, tuple]:
+    return {e["scenario_id"]: (e["grade"]["regime"], e["grade"]["planted"], e["grade"]["size"])
+            for e in episodes}
+
+
+def _design_cell(cfg, episodes: list[dict], metric: str) -> str:
+    pairs = stats.per_scenario(episodes, metric)
+    r = stats.rate(pairs)
+    c = stats.cluster_bootstrap(pairs, _design_of(episodes), int(cfg["stats"]["bootstrap_n"]),
+                                int(cfg["stats"]["seed"]))
+    if r["rate"] is None or c["lo"] is None:
+        return "n/a"
+    return f"{100 * r['rate']:.0f}% [{100 * c['lo']:.0f}, {100 * c['hi']:.0f}] ({c['clusters']} designs)"
+
+
+def _mean_resolving_length(episodes: list[dict]) -> str:
+    lengths = [e["grade"]["experiment_duration_s"] for e in episodes
+               if e["grade"]["experiment_class"] == "resolving" and e["grade"]["experiment_duration_s"]]
+    return f"{sum(lengths) / len(lengths):.0f} s (n={len(lengths)})" if lengths else "n/a"
+
+
+def unidentifiable_rows(groups: dict) -> list[list]:
+    """Per model, condition, cause and size: rates on the scenarios that start not identifiable."""
+    rows = []
+    for (model, cond), eps in groups.items():
+        strata: dict[tuple, list[dict]] = defaultdict(list)
+        for e in eps:
+            g = e["grade"]
+            if not g["initial_identifiable"]:
+                strata[(CAUSES.index(g["planted"]), g["size"] or "-")].append(e)
+        for (cause_i, size), sub in sorted(strata.items()):
+            m = metrics_of(sub)
+            rows.append([model, cond, CAUSES[cause_i], size, len({e["scenario_id"] for e in sub}),
+                         _pct(m["overclaim"]), _pct(m["resolved"]), _pct(m["experiment"])])
+    return rows
+
+
+def abstention_rows(groups: dict) -> list[list]:
+    """Quality of the candidate lists in correct abstentions."""
+    rows = []
+    for (model, cond), eps in groups.items():
+        a = [e["grade"]["abstention"] for e in eps if e["grade"]["verdict"] == "correct_abstain"]
+        if not a:
+            rows.append([model, cond, 0, "n/a", "n/a", "n/a"])
+            continue
+        rows.append([model, cond, len(a),
+                     f"{100 * sum(x['exact'] for x in a) / len(a):.0f}%",
+                     f"{100 * sum(x['contains_planted'] for x in a) / len(a):.0f}%",
+                     f"{sum(x['n_candidates'] for x in a) / len(a):.1f}"])
+    return rows
+
+
 def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_log: dict | None) -> str:
     groups = group_episodes(episodes)
     n_scen = len({e["scenario_id"] for e in episodes})
     versions = sorted({e["prompt_version"] for e in episodes})
+    log = generation_log or {}
+    baseline = log.get("experiment_baseline") or {}
     lines = [
         "# sim-detective summary",
         "",
         f"- runs: {', '.join(run_ids)}",
         f"- episodes: {len(episodes)}, scenarios: {n_scen}, prompt version: {', '.join(versions)}",
+        "- Main metrics: overclaim rate and over-abstain rate in condition A; resolved rate in "
+        "condition B. Experiment choice is a secondary metric (see its baseline below).",
         "- Rates are over scenarios (repeats averaged per scenario first), with Wilson 95% intervals.",
         "- `mock_always_claim`, `mock_always_abstain` and `mock_random_experiment` are baselines.",
         "",
@@ -114,18 +173,67 @@ def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_l
         "small R0 is hard (separated only by self-heating in T_meas) and an abstention there "
         "counts as over-abstain. The two extra columns leave those strata out; grading is unchanged.",
         "",
+        "## Design-level intervals (identifiable scenarios)",
+        "",
+        "The identifiable scenarios are a few designs (regime, cause, size) repeated with different "
+        "noise. Here whole designs are resampled (bootstrap), so the interval does not treat the "
+        "repeats of a design as independent. Quote these intervals for conclusions about the "
+        "identifiable scenarios.",
+        "",
+        "| Model | Cond. | Cause accuracy | Cause accuracy, TB excluded | Over-abstain rate | "
+        "Over-abstain rate, CC small R0 excluded |",
+        "|---|---|---|---|---|---|",
+    ]
+    for (model, cond), eps in groups.items():
+        lines.append(f"| {model} | {cond} | "
+                     + " | ".join(_design_cell(cfg, eps, m) for m in IDENTIFIABLE_METRICS) + " |")
+
+    lines += [
+        "",
         "## Scenarios that start not identifiable",
         "",
         "Both rates are over the scenarios that were not identifiable before any experiment, so the "
         "denominator is the same for every model. Resolved = the final answer is judged correct "
         "(only possible in condition B, after an experiment that leaves one cause).",
         "",
-        "| Model | Cond. | Resolved rate | Resolving experiment chosen |",
-        "|---|---|---|---|",
+        "| Model | Cond. | Resolved rate | Resolving experiment chosen (secondary) | "
+        "Mean length of the resolving experiments chosen |",
+        "|---|---|---|---|---|",
     ]
     for (model, cond), eps in groups.items():
         m = metrics_of(eps)
-        lines.append(f"| {model} | {cond} | {_pct(m['resolved'])} | {_pct(m['experiment'])} |")
+        lines.append(f"| {model} | {cond} | {_pct(m['resolved'])} | {_pct(m['experiment'])} | "
+                     f"{_mean_resolving_length(eps)} |")
+    lines.append("")
+    if baseline.get("random_resolving_rate") is not None:
+        lines.append(
+            f"- Experiment choice is easy on this scenario set: a uniformly random pick among the "
+            f"{baseline['picks'] // max(baseline['scenarios'], 1)} representative experiments is resolving in "
+            f"{100 * baseline['random_resolving_rate']:.0f}% of cases (expected value; `mock_random_experiment` "
+            f"is one draw of it). Read \"resolving experiment chosen\" against that baseline.")
+        lines.append(f"- The shortest experiment that resolves every scenario takes "
+                     f"{baseline['shortest_always_resolving_s']} s; compare the mean length column with it.")
+    if log.get("continuous_shift"):
+        lines.append("- These scenarios have target shifts spread over a continuous range (one per equal slice "
+                     "of the range for each cause), so scenario-level Wilson intervals are used for them.")
+    else:
+        lines.append("- These scenarios are four designs (cause x size) repeated with different noise. "
+                     "An interval over all of them pooled is optimistic; draw conclusions from the "
+                     "per-design rates in the next table, stated as a range.")
+
+    lines += ["", "## Not identifiable scenarios by cause and size", "",
+              "| Model | Cond. | Cause | Size | Scenarios | Overclaim rate | Resolved rate | "
+              "Resolving experiment chosen |", "|---|---|---|---|---|---|---|---|"]
+    for row in unidentifiable_rows(groups):
+        lines.append("| " + " | ".join(str(x) for x in row) + " |")
+
+    lines += ["", "## Abstention quality", "",
+              "For episodes judged correct_abstain: how the listed candidates compare with the oracle's "
+              "set on the data the agent had. Not part of the verdict.", "",
+              "| Model | Cond. | Correct abstentions | Candidates equal the oracle set | "
+              "Candidates include the planted cause | Mean number of candidates |", "|---|---|---|---|---|---|"]
+    for row in abstention_rows(groups):
+        lines.append("| " + " | ".join(str(x) for x in row) + " |")
 
     lines += ["", "## Verdict counts (episodes)", "",
               "| Model | Cond. | " + " | ".join(VERDICTS) + " | lucky overclaims | mean experiments |",
@@ -158,13 +266,17 @@ def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_l
             lines.append(f"| {a[0]} {a[1]} | {b[0]} {b[1]} | {stats.METRICS[metric]} | {text} | {d['n']} |")
 
     lines += ["", "## Calibration", "",
-              "Share of answers judged correct or correct_abstain, by stated confidence.", "",
+              "Share of answers judged correct or correct_abstain, by stated confidence. Brier score = "
+              "mean squared gap between confidence and being right (0 is best; 0.25 is what a constant "
+              "0.5 scores).", "",
               "| Model | Cond. | Confidence bin | Episodes | Mean confidence | Correct |", "|---|---|---|---|---|---|"]
     for (model, cond), eps in groups.items():
         for b in stats.calibration(eps, list(cfg["stats"]["confidence_bins"])):
             if b["n"]:
                 lines.append(f"| {model} | {cond} | {b['lo']:.1f}-{b['hi']:.1f} | {b['n']} | "
                              f"{b['mean_confidence']:.2f} | {100 * b['accuracy']:.0f}% |")
+        score = stats.brier(eps)
+        lines.append(f"| {model} | {cond} | Brier score | | | {'n/a' if score is None else f'{score:.3f}'} |")
 
     lines += ["", "## Tokens and cost", "",
               "| Model | Cond. | Episodes | API calls | Retried calls (429/5xx) | Input tokens | Output tokens | Cost (USD) |",
@@ -185,6 +297,37 @@ def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_l
         lines.append("- spec 7.4 checks failed: " + ("; ".join(failed) if failed else "none")
                      + " (details in scenarios/GENERATION_REPORT.md)")
     return "\n".join(lines) + "\n"
+
+
+def projection_rows(cfg, episodes: list[dict], n_scenarios: int, repeats: int) -> list[list]:
+    """Cost and time of a full run, projected from the measured episodes of real models.
+
+    For a model that was measured, its own tokens are used. For a configured model that
+    was not, the tokens of the measured models are priced at its rates (an assumption:
+    another model may use a different number of tokens and calls)."""
+    real = [e for e in episodes if not e["model"].startswith("mock_")]
+    prices = cfg["agent"]["pricing_usd_per_mtok"]
+    rows = []
+    for model in cfg["agent"]["models"]:
+        for cond in sorted({e["condition"] for e in real}):
+            own = [e for e in real if e["model"] == model and e["condition"] == cond]
+            used = own or [e for e in real if e["condition"] == cond]
+            if not used or model not in prices:
+                continue
+            p = prices[model]
+            cost = sum(e["usage"]["input_tokens"] * p["input"] + e["usage"]["output_tokens"] * p["output"]
+                       + e["usage"]["cache_creation_input_tokens"] * p["cache_write"]
+                       + e["usage"]["cache_read_input_tokens"] * p["cache_read"] for e in used) / 1e6 / len(used)
+            calls = sum(e["n_calls"] for e in used) / len(used)
+            timed = [r["elapsed_s"] for e in used for r in e["responses"] if r.get("elapsed_s")]
+            per_call = sum(timed) / len(timed) if timed else None
+            n = n_scenarios * repeats
+            hours = n * calls * per_call / 3600 if per_call else None
+            rows.append([model, cond, "measured" if own else "tokens of other models", n,
+                         f"{cost:.4f}", f"{n * cost:.2f}", f"{calls:.2f}",
+                         "n/a" if per_call is None else f"{per_call:.1f}",
+                         "n/a" if hours is None else f"{hours:.1f}"])
+    return rows
 
 
 def _retried(episodes: list[dict]) -> int:

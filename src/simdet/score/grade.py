@@ -5,7 +5,7 @@ from __future__ import annotations
 from simdet.oracle.experiments import classify, narrowed, nearest_representative, oracle_of
 from simdet.scenario.world import world_from_private
 from simdet.sim.faults import CAUSE_OF_LABEL
-from simdet.sim.profiles import validate_experiment
+from simdet.sim.profiles import experiment_duration_s, validate_experiment
 
 VERDICTS = ("correct", "wrong_cause", "over_abstain", "correct_abstain", "overclaim",
             "invalid", "ungraded")
@@ -48,6 +48,14 @@ def grade_episode(cfg, record: dict, private: dict) -> dict:
     else:
         verdict = "correct_abstain"
 
+    # Quality of an abstention (not part of the verdict): how the listed candidates
+    # compare with the oracle's set on the data the agent had.
+    abstention = None
+    if record["status"] == "answered" and not claimed:
+        listed = {CAUSE_OF_LABEL[c] for c in answer.get("candidates", [])}
+        abstention = {"n_candidates": len(listed), "exact": listed == set(final_set),
+                      "contains_planted": cause in listed}
+
     experiment_class = None
     if not private["identifiable"]:
         if record["condition"] == "B":
@@ -67,9 +75,26 @@ def grade_episode(cfg, record: dict, private: dict) -> dict:
         "final_set": list(final_set),
         "final_status": final_status,
         "experiment_class": experiment_class,
+        "experiment_duration_s": _chosen_duration(cfg, record, answer.get("next_experiment")),
+        "abstention": abstention,
         "n_experiments": len(record["experiments"]),
         "confidence": answer.get("confidence"),
     }
+
+
+def _chosen_duration(cfg, record: dict, proposal) -> int | None:
+    """Length of the experiment the agent chose: the first one it ran (condition B) or
+    the one it proposed (condition A). None if there is none or its arguments are invalid."""
+    if record["condition"] == "B":
+        chosen = record["experiments"][0] if record["experiments"] else None
+    else:
+        chosen = proposal if isinstance(proposal, dict) and proposal.get("name") not in (None, "none") else None
+    if not chosen:
+        return None
+    try:
+        return experiment_duration_s(cfg, chosen["name"], validate_experiment(cfg, chosen["name"], chosen.get("args")))
+    except ValueError:
+        return None
 
 
 def _proposed_class(cfg, private: dict, proposal) -> str:

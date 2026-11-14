@@ -6,6 +6,7 @@ import argparse
 import json
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from simdet.config import load_config, paths
@@ -143,39 +144,80 @@ def cmd_run(args) -> int:
         suffix += 1
         run_dir = p.results / f"{run_id}-{suffix}"
     run_dir.mkdir(parents=True)
+    workers = max(1, args.workers or int(cfg["agent"].get("workers", 1)))
     (run_dir / "run.json").write_text(json.dumps({
         "run_id": run_dir.name, "models": models, "conditions": conditions, "repeats": args.repeats,
         "scenario_ids": ids, "prompt_version": cfg["agent"]["prompt_version"],
-        "effort": cfg["agent"].get("effort"), "max_tokens": cfg["agent"]["max_tokens"],
+        "effort": cfg["agent"].get("effort"), "thinking_display": cfg["agent"].get("thinking_display"),
+        "max_tokens": cfg["agent"]["max_tokens"], "workers": workers,
         "config_sha": cfg.physics_sha(), "budget_usd": budget.limit_usd,
+        "environment": _environment(), "config": cfg.raw,
     }, indent=1), encoding="utf-8")
 
+    clients = {m: (make_mock(m, p.private, cfg) if m in MOCK_NAMES else ClaudeClient(m, cfg, p.cache, budget))
+               for m in models}
+    privates = {pub["id"]: load_private(p.private, pub["id"]) for pub in publics}
+    tasks = [(m, cond, pub, rep) for m in models for cond in conditions
+             for pub in publics for rep in range(args.repeats)]
+
+    def work(task) -> dict:
+        m, cond, pub, rep = task
+        env = load_env(cfg, p.private, pub["id"]) if cond == "B" else None
+        record = run_episode(clients[m], cfg, pub, cond, env, rep)
+        record["grade"] = grade_episode(cfg, record, privates[pub["id"]])
+        return record
+
+    # Episodes run in parallel but are written in task order, so the file is the same
+    # for any number of workers.
     stopped = None
+    done: dict[tuple[str, str], int] = {}
+    pool = ThreadPoolExecutor(max_workers=workers)
     with open(run_dir / "episodes.jsonl", "x", encoding="utf-8") as out:
         try:
-            for m in models:
-                client = (make_mock(m, p.private, cfg) if m in MOCK_NAMES
-                          else ClaudeClient(m, cfg, p.cache, budget))
-                for cond in conditions:
-                    done = 0
-                    for pub in publics:
-                        private = load_private(p.private, pub["id"])
-                        for rep in range(args.repeats):
-                            env = load_env(cfg, p.private, pub["id"]) if cond == "B" else None
-                            record = run_episode(client, cfg, pub, cond, env, rep)
-                            record["grade"] = grade_episode(cfg, record, private)
-                            out.write(dumps(record) + "\n")
-                            out.flush()
-                            done += 1
-                    print(f"  {m} {cond}: {done} episodes, spent so far ${budget.spent_usd:.4f}")
+            for record in pool.map(work, tasks):
+                out.write(dumps(record) + "\n")
+                out.flush()
+                key = (record["model"], record["condition"])
+                done[key] = done.get(key, 0) + 1
+                if done[key] == n_episodes:
+                    print(f"  {key[0]} {key[1]}: {n_episodes} episodes, spent so far ${budget.spent_usd:.4f}")
         except BudgetExceeded as e:
             stopped = str(e)
             print(f"STOPPED: {e}. Episodes finished so far are saved.")
+        finally:
+            pool.shutdown(wait=True, cancel_futures=True)
     if stopped:
         (run_dir / "STOPPED.txt").write_text(stopped + "\n", encoding="utf-8")
     _report(cfg, p, [run_dir])
     print(f"run: {run_dir.name}")
     return 3 if stopped else 0
+
+
+def _environment() -> dict:
+    """What produced a run: code version and library versions (no secrets)."""
+    import platform
+    import subprocess
+    from importlib import metadata
+
+    def git(*cmd: str) -> str | None:
+        try:
+            return subprocess.run(["git", *cmd], capture_output=True, text=True, timeout=10,
+                                  cwd=Path(__file__).resolve().parent).stdout.strip() or None
+        except (OSError, subprocess.SubprocessError):
+            return None
+
+    def version(name: str) -> str | None:
+        try:
+            return metadata.version(name)
+        except metadata.PackageNotFoundError:
+            return None
+
+    return {
+        "git_commit": git("rev-parse", "HEAD"),
+        "git_dirty": bool(git("status", "--porcelain", "--", ":/src", ":/config", ":/scenarios")),
+        "python": platform.python_version(),
+        "packages": {n: version(n) for n in ("sim-detective", "anthropic", "numpy", "scipy")},
+    }
 
 
 def _report(cfg, p, run_dirs: list[Path]) -> Path | None:
@@ -225,7 +267,31 @@ def cmd_cost(args) -> int:
     widths = [max(len(r[i]) for r in rows) for i in range(len(header))]
     for r in rows:
         print("  ".join(c.ljust(w) for c, w in zip(r, widths)))
+    if args.project_repeats:
+        _print_projection(load_config(args.config), paths(), load_episodes(dirs), args.project_repeats)
     return 0
+
+
+def _print_projection(cfg, p, episodes: list[dict], repeats: int) -> None:
+    from simdet.scenario.public_view import list_ids
+    from simdet.score.report import projection_rows
+
+    n_scenarios = len(list_ids(p.public))
+    rows = projection_rows(cfg, episodes, n_scenarios, repeats)
+    if not rows:
+        print("no episodes of a real model in this run; nothing to project from")
+        return
+    workers = int(cfg["agent"].get("workers", 1))
+    print(f"\nprojection for {n_scenarios} scenarios x {repeats} repeat(s), from the measured episodes:")
+    header = ["model", "cond", "basis", "episodes", "usd/episode", "usd", "calls/episode", "s/call", "hours (1 worker)"]
+    table = [header] + rows
+    widths = [max(len(str(r[i])) for r in table) for i in range(len(header))]
+    for r in table:
+        print("  ".join(str(c).ljust(w) for c, w in zip(r, widths)))
+    total = sum(float(r[5]) for r in rows)
+    hours = [float(r[8]) for r in rows if r[8] != "n/a"]
+    print(f"total about ${total:.2f} (budget ${float(cfg['agent']['budget_usd']):.2f})"
+          + (f"; about {sum(hours) / workers:.1f} h with {workers} workers" if hours else ""))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -251,7 +317,9 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--limit", type=int, default=None, help="use only the first N scenarios")
     r.add_argument("--yes", action="store_true", help="actually call the API")
     r.add_argument("--no-baselines", action="store_true",
-                   help="do not add the two mock baselines to a run with real models")
+                   help="do not add the mock baselines to a run with real models")
+    r.add_argument("--workers", type=int, default=None,
+                   help="episodes run in parallel (default: config agent.workers)")
     r.set_defaults(func=cmd_run)
 
     rep = sub.add_parser("report", help="build summary, figures and examples for a run")
@@ -260,6 +328,8 @@ def main(argv: list[str] | None = None) -> int:
 
     cost = sub.add_parser("cost", help="tokens and cost of a run")
     cost.add_argument("--run", required=True)
+    cost.add_argument("--project-repeats", type=int, default=None,
+                      help="also project cost and time of a full run with this many repeats")
     cost.set_defaults(func=cmd_cost)
 
     args = parser.parse_args(argv)

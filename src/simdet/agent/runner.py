@@ -51,7 +51,7 @@ def run_episode(
         resp = client.create(system=system, messages=messages, tools=tools,
                              repeat_index=repeat_index, scenario_id=public["id"])
         responses.append({k: resp.get(k) for k in
-                          ("model", "content", "stop_reason", "usage", "cached", "cost_usd", "request_sha", "retries")})
+                          ("model", "content", "stop_reason", "usage", "cached", "cost_usd", "request_sha", "retries", "elapsed_s")})
         for k in USAGE_KEYS:
             usage[k] += resp["usage"].get(k) or 0
         cost += resp["cost_usd"]
@@ -107,6 +107,7 @@ def run_episode(
         "n_calls": len(responses),
         "usage": usage,
         "cost_usd": cost,
+        "elapsed_s": round(sum(r.get("elapsed_s") or 0.0 for r in responses), 3),
         # The first user message is the scenario's public file rendered by the prompt
         # version above; it is not repeated here.
         "transcript": messages[1:],

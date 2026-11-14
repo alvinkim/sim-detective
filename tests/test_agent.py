@@ -140,3 +140,39 @@ def test_validate_submit_rejects(change):
 def test_validate_submit_accepts_abstention():
     assert not validate_submit({**GOOD, "verdict": "not_identifiable", "cause": None,
                                 "candidates": ["soc_offset", "structural_change"]})
+
+
+def test_thinking_display_is_part_of_the_request(cfg, tmp_path):
+    import copy
+
+    from simdet.config import Config
+
+    seen = []
+
+    def send(request):
+        seen.append(request)
+        return FakeSend()(request)
+
+    raw = copy.deepcopy(cfg.raw)
+    raw["agent"]["thinking_display"] = "summarized"
+    msgs = [{"role": "user", "content": "q"}]
+    ClaudeClient(MODEL, cfg, tmp_path / "c", Budget(50), send=send).create("s", msgs, [])
+    ClaudeClient(MODEL, Config(raw), tmp_path / "c", Budget(50), send=send).create("s", msgs, [])
+    assert [r["thinking_display"] for r in seen] == [None, "summarized"]  # second is not a cache hit
+
+
+def test_parallel_run_writes_the_same_file_as_sequential(scenario_set, tmp_path, monkeypatch):
+    import shutil
+
+    from simdet.cli import main
+
+    shutil.copytree(scenario_set["root"], tmp_path / "scenarios")
+    monkeypatch.setenv("SIMDET_ROOT", str(tmp_path))
+    models = "mock_always_claim,mock_always_abstain,mock_oracle,mock_random_experiment"
+    for workers in ("1", "4"):
+        assert main(["run", "--model", models, "--condition", "A,B", "--limit", "16",
+                     "--repeats", "2", "--workers", workers]) == 0
+    first, second = sorted(d for d in (tmp_path / "results").iterdir() if d.is_dir())
+    a = (first / "episodes.jsonl").read_bytes()
+    assert a == (second / "episodes.jsonl").read_bytes() and a.count(b"\n") == 4 * 2 * 16 * 2
+    assert (first / "summary.md").read_text(encoding="utf-8") == (second / "summary.md").read_text(encoding="utf-8").replace(second.name, first.name)
