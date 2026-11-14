@@ -63,6 +63,11 @@ def experiment_profile(cfg, name: str, args: dict[str, float]) -> np.ndarray:
     raise ValueError(f"unknown experiment: {name}")
 
 
+def experiment_duration_s(cfg, name: str, args: dict[str, float]) -> int:
+    """Total length of an experiment, including the rests of a pulse test."""
+    return int(experiment_profile(cfg, name, args).size)
+
+
 def constant_blocks(current: np.ndarray, start: int = 0, end: int | None = None) -> list[tuple[int, int]]:
     """Half-open index ranges [a, b) of constant current inside [start, end)."""
     end = current.size if end is None else end

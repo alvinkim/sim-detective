@@ -13,6 +13,7 @@ import numpy as np
 from simdet.sim.profiles import constant_blocks
 
 ROW_COLUMNS = ["t_s", "I_A", "V_meas", "T_meas", "V_pred", "resid_mV"]
+HISTORY_COLUMNS = ["t_start", "t_end", "I_A"]
 BLOCK_COLUMNS = [
     "t_start", "t_end", "I_A", "resid_mean_mV", "resid_std_mV",
     "resid_first5s_mV", "resid_last5s_mV", "T_meas_mean", "T_meas_last",
@@ -58,12 +59,20 @@ def segment_view(cfg, seg, start: int | None = None, end: int | None = None) -> 
     }
 
 
+def history_view(seg) -> dict:
+    """The current applied before logging started, as constant-current blocks. The
+    current is measured exactly and the oracle uses it, so the agent gets it too; the
+    voltage and temperature of that time stay hidden."""
+    data = [[int(a), int(b), round(float(seg.current[a]), 2)]
+            for a, b in constant_blocks(seg.current, 0, seg.visible_from)]
+    return {"columns": HISTORY_COLUMNS, "data": data}
+
+
 def public_scenario(cfg, scenario_id: str, world) -> dict:
-    return {
-        "id": scenario_id,
-        "baseline": segment_view(cfg, world.baseline),
-        "current": segment_view(cfg, world.current),
-    }
+    def part(seg) -> dict:
+        return {"history": history_view(seg), **segment_view(cfg, seg)}
+
+    return {"id": scenario_id, "baseline": part(world.baseline), "current": part(world.current)}
 
 
 def list_ids(public_dir: str | Path) -> list[str]:

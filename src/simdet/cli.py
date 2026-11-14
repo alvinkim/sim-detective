@@ -24,6 +24,14 @@ def _print_checks(checks: list[dict]) -> bool:
     return ok
 
 
+def _print_audit(audit: list[dict]) -> bool:
+    """Aliasing audit of the SOC0 / ST pair (delta chi2 over fresh seeds)."""
+    for r in audit:
+        print(f"  [{'PASS' if r['passed'] else 'FAIL'}] alias audit {r['cause']} {r['label']}: "
+              f"mean delta chi2 {r['mean']:+.3f}, above boundary {100 * r['share_above']:.1f}% of {r['seeds']} seeds")
+    return all(r["passed"] for r in audit)
+
+
 def cmd_gen(args) -> int:
     from simdet.scenario import generate as g
 
@@ -36,11 +44,12 @@ def cmd_gen(args) -> int:
     checks = g.run_checks(privates)
     print(f"generated {len(privates)} of {args.n} scenarios; discarded {len(result['discarded'])}, "
           f"left empty {len(result['unfilled'])}")
-    ok = _print_checks(checks) and not result["unfilled"]
+    audit = g.run_audit(cfg)
+    ok = _print_checks(checks) and _print_audit(audit) and not result["unfilled"]
     save = ok or args.save_on_check_failure
     if save:
         g.save(result, p.scenarios)
-    report = g.write_report(cfg, result, checks, p.scenarios, saved=save)
+    report = g.write_report(cfg, result, checks, p.scenarios, saved=save, audit=audit)
     print(f"report: {report}")
     if not ok:
         print("Spec 7.4 is not met. " + ("Scenarios were saved anyway (--save-on-check-failure)."
@@ -62,6 +71,7 @@ def cmd_check(args) -> int:
         print(f"  oracle changed for {m['id']}: stored {m['stored']}, now {m['recomputed']} ({m['status']})")
     print(f"{len(privates)} scenarios, oracle recomputed: {len(mismatches)} differ from the stored verdict")
     ok = _print_checks(g.run_checks(privates))
+    ok = _print_audit(g.run_audit(cfg)) and ok
     return 0 if ok and not mismatches else 1
 
 

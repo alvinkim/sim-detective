@@ -8,24 +8,58 @@ from pathlib import Path
 
 import numpy as np
 
+from simdet.oracle.audit import alias_audit
 from simdet.oracle.experiments import experiment_power, oracle_of
 from simdet.scenario.public_view import public_scenario
 from simdet.scenario.world import World, world_from_private
-from simdet.sim.faults import LABELS, SHIFT_CAUSES, magnitude, make_fault
+from simdet.sim.faults import LABELS, SHIFT_CAUSES, magnitude, make_fault, target_shift
+from simdet.sim.profiles import experiment_duration_s
 
 NOTES_MARKER = "<!-- Notes below this line are written by hand and kept by `simdet gen`. -->"
 
 
-def plan(cfg, n: int) -> list[dict]:
-    """The 7.1 table as a list of slots, interleaved so that a prefix stays balanced."""
+def _is_continuous(cfg, regime: str, cause: str) -> bool:
+    cs = cfg["scenario"].get("continuous_shift")
+    return bool(cs) and regime == cs["regime"] and cause in cs["causes"]
+
+
+def size_label(cfg, target_v: float) -> str:
+    """Size bin of a continuously drawn target shift, e.g. '6-13mV'."""
+    cs = cfg["scenario"]["continuous_shift"]
+    lo, hi, split = (1e3 * float(cs[k]) for k in ("min_v", "max_v", "split_v"))
+    return f"{lo:g}-{split:g}mV" if target_v * 1e3 < split else f"{split:g}-{hi:g}mV"
+
+
+def _continuous_targets(cfg, count: int, master_seed: int, stream: int) -> list[float]:
+    """One target per equal-width bin of the range, so the whole range is covered and the
+    two size bins get the same number. Ordered low, high, low, ... to keep prefixes balanced."""
+    cs = cfg["scenario"]["continuous_shift"]
+    lo, hi = float(cs["min_v"]), float(cs["max_v"])
+    rng = np.random.default_rng([master_seed, 0xD2, stream])
+    targets = [lo + (hi - lo) * (k + rng.uniform()) / count for k in range(count)]
+    half = (count + 1) // 2
+    order = [k for pair in zip(range(half), range(half, count)) for k in pair]
+    order += [k for k in range(count) if k not in order]
+    return [targets[k] for k in order]
+
+
+def plan(cfg, n: int, master_seed: int = 0) -> list[dict]:
+    """The 7.1 table as a list of slots, interleaved so that a prefix stays balanced.
+    Each slot carries its target residual shift (None for H and N)."""
     groups: list[list[dict]] = []
     for regime, counts in cfg["scenario"]["plan"].items():
         for cause, count in counts.items():
+            if _is_continuous(cfg, regime, cause):
+                targets = _continuous_targets(cfg, count, master_seed, len(groups))
+                groups.append([{"regime": regime, "cause": cause, "size": size_label(cfg, t),
+                                "target_v": t} for t in targets])
+                continue
             if cause == "H":
                 sizes = [None] * count
             else:
                 sizes = ["small" if i % 2 == 0 else "large" for i in range(count)]
-            groups.append([{"regime": regime, "cause": cause, "size": s} for s in sizes])
+            groups.append([{"regime": regime, "cause": cause, "size": s,
+                            "target_v": target_shift(cause, s, cfg)} for s in sizes])
     base: list[dict] = []
     for i in range(max(len(g) for g in groups)):
         base.extend(g[i] for g in groups if i < len(g))
@@ -47,7 +81,8 @@ def build_private(cfg, scenario_id: str, slot: dict, seed: int, world: World, or
         "id": scenario_id,
         "cause": cause,
         "cause_label": LABELS[cause],
-        "magnitude": {"size": slot["size"], "value": magnitude(cause, slot["size"], cfg)},
+        "magnitude": {"size": slot["size"], "target_shift_v": slot["target_v"],
+                      "value": magnitude(cause, slot["size"], cfg, slot["target_v"])},
         "regime": slot["regime"],
         "seed": seed,
         "fault": asdict(world.fault),
@@ -65,12 +100,12 @@ def build_private(cfg, scenario_id: str, slot: dict, seed: int, world: World, or
 def generate(cfg, n: int, master_seed: int) -> dict:
     """Generate up to `n` scenarios. A slot whose oracle verdict is ambiguous or invalid
     is retried with another seed (rules 3 and 4 of spec 6.2), up to max_attempts."""
-    slots = plan(cfg, n)
+    slots = plan(cfg, n, master_seed)
     id_rng = np.random.default_rng([master_seed, 0x5D])
     used: set[str] = set()
     scenarios, discarded, unfilled = [], [], []
     for index, slot in enumerate(slots):
-        fault = make_fault(slot["cause"], magnitude(slot["cause"], slot["size"], cfg))
+        fault = make_fault(slot["cause"], magnitude(slot["cause"], slot["size"], cfg, slot["target_v"]))
         for attempt in range(int(cfg["scenario"]["max_attempts"])):
             seed = _slot_seed(master_seed, index, attempt)
             world = World(cfg, fault, slot["regime"], seed)
@@ -125,6 +160,45 @@ def run_checks(privates: list[dict]) -> list[dict]:
         {"name": "H scenarios give {H}, N scenarios give {N}", "failures": c3},
         {"name": "every non-identifiable scenario has a resolving experiment", "failures": c4},
     ]
+
+
+def audit_designs(cfg) -> list[dict]:
+    """Designs of the aliased pair to audit: the two named sizes, or four points of the
+    continuous range when that is on."""
+    cs = cfg["scenario"].get("continuous_shift")
+    if cs:
+        points = [(f"{1e3 * float(v):g} mV", float(v)) for v in cs["audit_points_v"]]
+    else:
+        points = [(size, float(v)) for size, v in cfg["faults"]["target_shift_v"].items()]
+    return [{"cause": c, "label": label, "target_v": v} for c in ("SOC0", "ST") for label, v in points]
+
+
+def run_audit(cfg) -> list[dict]:
+    return alias_audit(cfg, audit_designs(cfg))
+
+
+def experiment_baseline(cfg, privates: list[dict]) -> dict:
+    """What a uniformly random pick among the representative experiments achieves on the
+    not identifiable scenarios, and the shortest experiment that resolves all of them."""
+    counts: dict[str, int] = {}
+    per_rep: dict[tuple, dict] = {}
+    for p in privates:
+        for e in p["experiment_power"]:
+            counts[e["class"]] = counts.get(e["class"], 0) + 1
+            key = (e["name"], json.dumps(e["args"], sort_keys=True))
+            per_rep.setdefault(key, {"name": e["name"], "args": e["args"], "classes": {}})
+            c = per_rep[key]["classes"]
+            c[e["class"]] = c.get(e["class"], 0) + 1
+    n_scen = sum(1 for p in privates if p["experiment_power"])
+    always = [r for r in per_rep.values() if r["classes"].get("resolving", 0) == n_scen and n_scen]
+    durations = [experiment_duration_s(cfg, r["name"], r["args"]) for r in always]
+    total = sum(counts.values())
+    return {
+        "scenarios": n_scen, "picks": total, "classes": counts,
+        "random_resolving_rate": counts.get("resolving", 0) / total if total else None,
+        "shortest_always_resolving_s": min(durations) if durations else None,
+        "per_representative": list(per_rep.values()),
+    }
 
 
 def recheck(cfg, privates: list[dict]) -> list[dict]:
@@ -184,7 +258,8 @@ def discard_summary(result_or_log: dict) -> dict:
     return {"discarded": reasons, "unfilled": len(result_or_log.get("unfilled", []))}
 
 
-def write_report(cfg, result: dict, checks: list[dict], scenarios_dir: str | Path, saved: bool) -> Path:
+def write_report(cfg, result: dict, checks: list[dict], scenarios_dir: str | Path, saved: bool,
+                 audit: list[dict] | None = None) -> Path:
     """Write scenarios/GENERATION_REPORT.md and generation_log.json."""
     root = Path(scenarios_dir)
     root.mkdir(parents=True, exist_ok=True)
@@ -241,6 +316,32 @@ def write_report(cfg, result: dict, checks: list[dict], scenarios_dir: str | Pat
                 lines.append(f"| {f['id']} | {f['regime']} | {f['cause']} | {f['size']} | "
                              f"{{{', '.join(f['consistent_set'])}}} | {f['why']} | {cells} |")
             lines.append("")
+    baseline = experiment_baseline(cfg, privates)
+    lines += ["## Representative experiments on the not identifiable scenarios", "",
+              "| experiment | arguments | length (s) | classes over the scenarios |", "|---|---|---|---|"]
+    for r in baseline["per_representative"]:
+        args = ", ".join(f"{k}={v:g}" for k, v in r["args"].items())
+        classes = ", ".join(f"{k} {v}" for k, v in sorted(r["classes"].items()))
+        lines.append(f"| {r['name']} | {args} | {experiment_duration_s(cfg, r['name'], r['args'])} | {classes} |")
+    if baseline["picks"]:
+        lines += ["", f"A uniformly random pick is resolving in {baseline['classes'].get('resolving', 0)} of "
+                  f"{baseline['picks']} cases ({100 * baseline['random_resolving_rate']:.0f}%). "
+                  f"Refused by the SOC guard: {baseline['classes'].get('rejected', 0)}. "
+                  f"Shortest experiment that resolves every scenario: {baseline['shortest_always_resolving_s']} s."]
+    lines.append("")
+    if audit is not None:
+        a = cfg["scenario"]["alias_audit"]
+        lines += ["## Aliasing audit (SOC0 vs ST, CC regime)", "",
+                  f"delta chi2 = fit objective of the wrong candidate minus that of the planted cause, "
+                  f"{a['seeds']} fresh seeds per design. Pass: |mean| <= {a['mean_abs_max']} and share above "
+                  f"{a['exceed_level']} <= {100 * a['exceed_share_max']:g}%. {a['exceed_level']} is a decision "
+                  "boundary, not a p-value (the hypotheses are not nested). Audit only; the oracle uses RMS.", "",
+                  "| planted | design | target shift (mV) | mean | max | share above | result |",
+                  "|---|---|---|---|---|---|---|"]
+        for r in audit:
+            lines.append(f"| {r['cause']} | {r['label']} | {r['target_mv']:g} | {r['mean']:.3f} | {r['max']:.2f} | "
+                         f"{100 * r['share_above']:.1f}% | {'PASS' if r['passed'] else 'FAIL'} |")
+        lines.append("")
     path = root / "GENERATION_REPORT.md"
     notes = ""
     if path.exists():
@@ -252,6 +353,9 @@ def write_report(cfg, result: dict, checks: list[dict], scenarios_dir: str | Pat
         "requested": result["requested"], "seed": result["seed"], "generated": len(privates),
         "saved": saved, "discarded": result["discarded"], "unfilled": result["unfilled"],
         "checks": [{"name": c["name"], "failed": len(c["failures"])} for c in checks],
+        "continuous_shift": bool(cfg["scenario"].get("continuous_shift")),
+        "experiment_baseline": {k: v for k, v in baseline.items() if k != "per_representative"},
+        "alias_audit": audit,
     })
     return path
 

@@ -24,8 +24,10 @@ sim:
 regimes:                    # 5.6
   CC:
     current_a: 25.0
-    pre_s: 1200             # run before the logged window (not shown to the agent)
-    observe_s: 1200
+    # pre_s 1200 -> 2400 and observe_s 1200 -> 600 (SIMDET-DECISION-001, P2): v2 of the ST cause
+    # is saturated before logging starts, so SOC0 and ST leave no difference inside the window.
+    pre_s: 2400             # run before the logged window (voltage and temperature not shown)
+    observe_s: 600
   DYN:
     steps:                  # [current_a, duration_s]
       - [0, 600]
@@ -80,19 +82,29 @@ experiments:                # 6.3
       - {duration_s: 5400}
     cc_run:
       - {current_a: 5, duration_s: 600}
-      - {current_a: 15, duration_s: 1200}
-      - {current_a: 25, duration_s: 900}
+      - {current_a: 15, duration_s: 600}     # shortened to stay inside the SOC guard (SIMDET-DECISION-002, A2)
+      - {current_a: 25, duration_s: 300}
 
 scenario:                   # 7
   max_rows: 240
   edge_samples: 3
   max_attempts: 5           # seeds tried per scenario slot before giving up
+  # Audit of the aliased pair (SIMDET-DECISION-002, A1): chi-square of the wrong candidate minus
+  # that of the planted one, over fresh seeds. It only audits; the RMS rules decide the oracle.
+  alias_audit:
+    seeds: 200
+    mean_abs_max: 0.5
+    exceed_level: 3.84      # a decision boundary, not a p-value (the two hypotheses are not nested)
+    exceed_share_max: 0.05
+  # D2 (SIMDET-DECISION-001/002): draw the target shift of these scenarios from a continuous range
+  # instead of small / large. null = off.
+  continuous_shift: null
   plan:                     # 7.1: count per regime and cause
     DYN: {H: 4, N: 4, R0: 6, SOC0: 6, TB: 6, ST: 6}
     CC: {H: 2, N: 2, R0: 6, SOC0: 12, TB: 6, ST: 12}   # SOC0, ST raised from 6: the only CC pair that is not identifiable (see GENERATION_REPORT.md)
 
 agent:                      # 8
-  prompt_version: v1
+  prompt_version: v2        # v2 = v1 + the current applied before logging started (history)
   models: [claude-haiku-5-5, claude-sonnet-5-5]
   max_tokens: 16000
   effort: medium            # sent as output_config.effort to every model; null = API default per model

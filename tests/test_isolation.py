@@ -46,8 +46,33 @@ def test_public_files_hold_only_id_and_data(scenario_set):
         assert set(public) == {"id", "baseline", "current"}
         assert re.fullmatch(r"[0-9a-f]{8}", public["id"])
         for part in ("baseline", "current"):
-            assert set(public[part]) == {"rows", "blocks"}
+            assert set(public[part]) == {"history", "rows", "blocks"}
+            assert public[part]["history"]["columns"] == ["t_start", "t_end", "I_A"]
             assert len(public[part]["rows"]["data"]) <= 240
+
+
+def test_history_gives_only_the_current_before_logging(cfg, scenario_set):
+    version = cfg["agent"]["prompt_version"]
+    assert version == "v2"
+    for private in scenario_set["privates"]:
+        public = scenario_set["publics"][private["id"]]
+        user = build_user_message(public, version)
+        for part in ("baseline", "current"):
+            history = public[part]["history"]["data"]
+            first_row = public[part]["rows"]["data"][0][0]
+            if private["regime"] == "CC":
+                assert history == [[0, 2400, 25.0]] and first_row == 2400
+            else:
+                assert history == [] and first_row == 0
+        assert ("0,2400,25" in user) == (private["regime"] == "CC")
+        assert ("history:\nnone" in user) == (private["regime"] == "DYN")
+
+
+def test_prompt_v1_is_kept_and_still_renders(cfg, scenario_set):
+    public = next(iter(scenario_set["publics"].values()))
+    assert "history" not in build_user_message(public, "v1")
+    assert "history" not in build_system_prompt(cfg, "A", "v1")
+    assert "history" in build_system_prompt(cfg, "A", "v2")
 
 
 def test_agent_modules_do_not_touch_private_data():

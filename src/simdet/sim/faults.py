@@ -83,11 +83,19 @@ def calibrate(cause: str, target_shift_v: float, i_cc: float, cfg) -> float:
     )
 
 
-def magnitude(cause: str, size: str | None, cfg) -> float:
-    """Planted magnitude for a cause and size ('small' | 'large')."""
+def target_shift(cause: str, size: str | None, cfg) -> float | None:
+    """Target mean residual shift (V) of a shift cause at a named size; None for H and N."""
+    return float(cfg["faults"]["target_shift_v"][size]) if cause in SHIFT_CAUSES else None
+
+
+def magnitude(cause: str, size: str | None, cfg, target_v: float | None = None) -> float:
+    """Planted magnitude for a cause. Shift causes are calibrated to `target_v` if given,
+    otherwise to the configured target of `size` ('small' | 'large')."""
     if cause == "H":
         return 0.0
     f = cfg["faults"]
     if cause == "N":
         return float(f["noise_mult"][size])
-    return calibrate(cause, f["target_shift_v"][size], f["calibration_current_a"], cfg)
+    if target_v is None:
+        target_v = target_shift(cause, size, cfg)
+    return calibrate(cause, target_v, f["calibration_current_a"], cfg)

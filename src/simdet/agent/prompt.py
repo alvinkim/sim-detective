@@ -62,10 +62,18 @@ def table_csv(table: dict) -> str:
     return "\n".join(lines)
 
 
+def _history_csv(part: dict) -> str:
+    table = part.get("history")
+    return table_csv(table) if table and table["data"] else "none"
+
+
 def build_user_message(public: dict, version: str) -> str:
-    """The scenario data: rows and blocks of the baseline and current segments."""
+    """The scenario data: history, rows and blocks of the baseline and current segments.
+    (prompt v1 has no history placeholder and ignores it.)"""
     return Template(_sections(version)["USER"]).substitute(
         scenario_id=public["id"],
+        baseline_history=_history_csv(public["baseline"]),
+        current_history=_history_csv(public["current"]),
         baseline_rows=table_csv(public["baseline"]["rows"]),
         baseline_blocks=table_csv(public["baseline"]["blocks"]),
         current_rows=table_csv(public["current"]["rows"]),

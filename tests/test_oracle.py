@@ -57,7 +57,7 @@ def test_long_rest_separates_r0_and_tb_in_cc(cfg, cause, other, duration):
 def test_cc_run_at_the_regime_current_is_never_resolving(cfg, cause, size):
     w = world(cfg, cause, size, "CC")
     before = oracle_of(cfg, w, cause).consistent_set
-    for duration in (60, 600, 900):
+    for duration in (60, 300, 400):
         out = experiment_outcome(cfg, w, "cc_run", {"current_a": 25, "duration_s": duration}, before, cause)
         assert out["class"] == "useless"
 
@@ -69,6 +69,43 @@ def test_cc_run_is_never_resolving_at_any_current(cfg):
     before = oracle_of(cfg, w, "SOC0").consistent_set
     out = experiment_outcome(cfg, w, "cc_run", {"current_a": 5, "duration_s": 600}, before, "SOC0")
     assert out["class"] != "resolving"
+
+
+def test_alias_audit_finds_no_signal_between_soc0_and_st(cfg):
+    import copy
+
+    from simdet.config import Config
+    from simdet.scenario.generate import audit_designs
+    from simdet.oracle.audit import alias_audit
+
+    raw = copy.deepcopy(cfg.raw)
+    raw["scenario"]["alias_audit"]["seeds"] = 20
+    rows = alias_audit(Config(raw), audit_designs(Config(raw)))
+    assert len(rows) == 4 and all(r["passed"] for r in rows)
+    assert all(abs(r["mean"]) < 0.1 and r["share_above"] == 0 for r in rows)
+
+
+def test_alias_audit_detects_an_unsaturated_branch(cfg):
+    """With the earlier 1200 s pre-run the ST branch is still settling inside the window,
+    and the audit must fail for the large size (the reason for SIMDET-DECISION-001 P2)."""
+    import copy
+
+    from simdet.config import Config
+    from simdet.oracle.audit import alias_audit
+
+    raw = copy.deepcopy(cfg.raw)
+    raw["regimes"]["CC"].update(pre_s=1200, observe_s=1200)
+    raw["scenario"]["alias_audit"]["seeds"] = 30
+    row = alias_audit(Config(raw), [{"cause": "ST", "label": "large", "target_v": 0.016}])[0]
+    assert not row["passed"] and row["mean"] > 3
+
+
+def test_representative_experiments_fit_the_soc_guard(scenario_set):
+    for p in scenario_set["privates"]:
+        assert all(e["class"] != "rejected" for e in p["experiment_power"])
+        same_current = [e for e in p["experiment_power"]
+                        if e["name"] == "cc_run" and e["args"]["current_a"] == 25]
+        assert all(e["class"] == "useless" for e in same_current)
 
 
 def test_h_and_n_scenarios(cfg):
