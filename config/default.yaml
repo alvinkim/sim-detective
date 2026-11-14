@@ -89,7 +89,7 @@ scenario:                   # 7
   max_attempts: 5           # seeds tried per scenario slot before giving up
   plan:                     # 7.1: count per regime and cause
     DYN: {H: 4, N: 4, R0: 6, SOC0: 6, TB: 6, ST: 6}
-    CC: {H: 2, N: 2, R0: 6, SOC0: 6, TB: 6, ST: 6}
+    CC: {H: 2, N: 2, R0: 6, SOC0: 12, TB: 6, ST: 12}   # SOC0, ST raised from 6: the only CC pair that is not identifiable (see GENERATION_REPORT.md)
 
 agent:                      # 8
   prompt_version: v1
