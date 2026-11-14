@@ -81,7 +81,7 @@ def test_alias_audit_finds_no_signal_between_soc0_and_st(cfg):
     raw = copy.deepcopy(cfg.raw)
     raw["scenario"]["alias_audit"]["seeds"] = 20
     rows = alias_audit(Config(raw), audit_designs(Config(raw)))
-    assert len(rows) == 4 and all(r["passed"] for r in rows)
+    assert len(rows) == 8 and all(r["passed"] for r in rows)  # SOC0, ST x 6, 10, 15, 20 mV
     assert all(abs(r["mean"]) < 0.1 and r["share_above"] == 0 for r in rows)
 
 
@@ -106,6 +106,23 @@ def test_representative_experiments_fit_the_soc_guard(scenario_set):
         same_current = [e for e in p["experiment_power"]
                         if e["name"] == "cc_run" and e["args"]["current_a"] == 25]
         assert all(e["class"] == "useless" for e in same_current)
+
+
+def test_continuous_shift_covers_the_range_evenly(cfg, scenario_set):
+    """D2: CC SOC0 / ST targets are one per twelfth of 6-20 mV; everything else keeps 8 / 16 mV."""
+    for cause in ("SOC0", "ST"):
+        targets = sorted(1e3 * p["magnitude"]["target_shift_v"] for p in scenario_set["privates"]
+                         if p["regime"] == "CC" and p["cause"] == cause)
+        assert len(targets) == 12
+        width = 14 / 12
+        assert [int((t - 6) // width) for t in targets] == list(range(12))
+        sizes = [p["magnitude"]["size"] for p in scenario_set["privates"]
+                 if p["regime"] == "CC" and p["cause"] == cause]
+        assert sizes.count("6-13mV") == 6 and sizes.count("13-20mV") == 6
+    for p in scenario_set["privates"]:
+        if p["cause"] in ("R0", "TB") or (p["regime"] == "DYN" and p["cause"] in ("SOC0", "ST")):
+            assert p["magnitude"]["target_shift_v"] in (0.008, 0.016)
+            assert p["magnitude"]["size"] in ("small", "large")
 
 
 def test_h_and_n_scenarios(cfg):

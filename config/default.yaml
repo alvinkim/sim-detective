@@ -98,7 +98,13 @@ scenario:                   # 7
     exceed_share_max: 0.05
   # D2 (SIMDET-DECISION-001/002): draw the target shift of these scenarios from a continuous range
   # instead of small / large. null = off.
-  continuous_shift: null
+  continuous_shift:
+    regime: CC
+    causes: [SOC0, ST]
+    min_v: 0.006
+    max_v: 0.020
+    split_v: 0.013          # size bins for reporting: below / at or above
+    audit_points_v: [0.006, 0.010, 0.015, 0.020]
   plan:                     # 7.1: count per regime and cause
     DYN: {H: 4, N: 4, R0: 6, SOC0: 6, TB: 6, ST: 6}
     CC: {H: 2, N: 2, R0: 6, SOC0: 12, TB: 6, ST: 12}   # SOC0, ST raised from 6: the only CC pair that is not identifiable (see GENERATION_REPORT.md)
