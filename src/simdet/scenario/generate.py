@@ -96,7 +96,8 @@ def generate(cfg, n: int, master_seed: int) -> dict:
 
 
 def run_checks(privates: list[dict]) -> list[dict]:
-    """The four conditions of spec 7.4. Each returns the scenarios that violate it."""
+    """The conditions of spec 7.4, with the second one as revised by SIMDET-FOLLOWUP-001
+    section 3. Each returns the scenarios that violate it."""
 
     def brief(p: dict, why: str) -> dict:
         return {"id": p["id"], "regime": p["regime"], "cause": p["cause"],
@@ -106,8 +107,12 @@ def run_checks(privates: list[dict]) -> list[dict]:
     c1 = [brief(p, "not identifiable") for p in privates
           if p["regime"] == "DYN" and p["magnitude"]["size"] == "large"
           and p["cause"] in SHIFT_CAUSES and not p["identifiable"]]
-    c2 = [brief(p, "consistent set has fewer than 2 causes") for p in privates
-          if p["regime"] == "CC" and p["cause"] in SHIFT_CAUSES and len(p["consistent_set"]) < 2]
+    c2 = [brief(p, "set is not {SOC0, ST}") for p in privates
+          if p["regime"] == "CC" and p["cause"] in ("SOC0", "ST")
+          and set(p["consistent_set"]) != {"SOC0", "ST"}]
+    c2b = [brief(p, "set is not exactly the planted cause") for p in privates
+           if p["regime"] == "CC" and p["cause"] in ("R0", "TB")
+           and p["consistent_set"] != [p["cause"]]]
     c3 = [brief(p, "set is not exactly the planted cause") for p in privates
           if p["cause"] in ("H", "N") and p["consistent_set"] != [p["cause"]]]
     c4 = [brief(p, "no resolving experiment") for p in privates
@@ -115,7 +120,8 @@ def run_checks(privates: list[dict]) -> list[dict]:
           and not any(e["class"] == "resolving" for e in p["experiment_power"])]
     return [
         {"name": "DYN large scenarios are identifiable", "failures": c1},
-        {"name": "CC scenarios of R0, SOC0, TB, ST have a consistent set of size >= 2", "failures": c2},
+        {"name": "CC scenarios of SOC0 and ST give exactly {SOC0, ST}", "failures": c2},
+        {"name": "CC scenarios of R0 and TB give exactly the planted cause", "failures": c2b},
         {"name": "H scenarios give {H}, N scenarios give {N}", "failures": c3},
         {"name": "every non-identifiable scenario has a resolving experiment", "failures": c4},
     ]

@@ -1,8 +1,8 @@
 """Oracle tests (spec 12).
 
-Two rows of the spec table do not hold with the spec's own equations and default
-parameters; they are kept as strict xfails next to the statement that does hold.
-See scenarios/GENERATION_REPORT.md.
+In the CC regime only SOC0 and ST alias; R0 and TB are identified through the
+temperature channel (SIMDET-FOLLOWUP-001 section 3). The spec's "cc_run never resolves"
+holds only at the regime current and is kept as a strict xfail next to that statement.
 """
 
 import pytest
@@ -24,12 +24,15 @@ def test_cc_soc0_and_st_are_jointly_consistent(cfg, cause, size):
     assert set(result.consistent_set) == {"SOC0", "ST"}
 
 
-@pytest.mark.xfail(strict=True, reason="spec 12 expects R0 and SOC0 to alias in CC; the extra "
-                   "self-heating of a larger R0 shows in T_meas and rejects SOC0")
-@pytest.mark.parametrize("cause", ["R0", "SOC0"])
-def test_cc_r0_and_soc0_are_jointly_consistent(cfg, cause):
-    result = oracle_of(cfg, world(cfg, cause, "small", "CC"), cause)
-    assert {"R0", "SOC0"} <= set(result.consistent_set)
+@pytest.mark.parametrize("cause", ["R0", "TB"])
+@pytest.mark.parametrize("size", ["small", "large"])
+def test_cc_r0_and_tb_are_identified_by_the_temperature_channel(cfg, cause, size):
+    result = oracle_of(cfg, world(cfg, cause, size, "CC"), cause)
+    assert result.status == "ok"
+    assert result.consistent_set == (cause,)
+    # the hypotheses that explain the voltage are rejected on temperature alone
+    for other in {"SOC0", "ST"} if cause == "R0" else {"H", "SOC0", "ST"}:
+        assert result.fits[other].rms_v < 1.15 and result.fits[other].rms_t >= 1.5
 
 
 @pytest.mark.parametrize("cause", SHIFT_CAUSES)
@@ -74,12 +77,14 @@ def test_h_and_n_scenarios(cfg):
         assert oracle_of(cfg, world(cfg, "N", size, "CC"), "N").consistent_set == ("N",)
 
 
-def test_generated_set_meets_checks_except_cc_aliasing(cfg, scenario_set):
+def test_generated_set_meets_all_checks(cfg, scenario_set):
     from simdet.scenario.generate import run_checks
 
-    checks = {c["name"]: c["failures"] for c in run_checks(scenario_set["privates"])}
-    cc = "CC scenarios of R0, SOC0, TB, ST have a consistent set of size >= 2"
-    assert all(not failures for name, failures in checks.items() if name != cc)
-    # the known gap: R0 and TB are identifiable in CC through the temperature channel
-    assert {f["cause"] for f in checks[cc]} == {"R0", "TB"}
-    assert not scenario_set["result"]["unfilled"]
+    privates = scenario_set["privates"]
+    assert all(not c["failures"] for c in run_checks(privates))
+    assert not scenario_set["result"]["unfilled"] and not scenario_set["result"]["discarded"]
+    assert len(privates) == 72
+    assert sum(p["identifiable"] for p in privates) == 48
+    not_identifiable = [p for p in privates if not p["identifiable"]]
+    assert len(not_identifiable) == 24
+    assert all(p["regime"] == "CC" and p["cause"] in ("SOC0", "ST") for p in not_identifiable)

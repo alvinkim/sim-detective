@@ -47,7 +47,9 @@ def _sdk_send(max_retries: int, backoff_base_s: float, sleep: Callable[[float], 
             kwargs["output_config"] = {"effort": request["effort"]}
         for attempt in range(max_retries + 1):
             try:
-                return sdk.messages.create(**kwargs).to_dict()
+                raw = sdk.messages.create(**kwargs).to_dict()
+                raw["_retries"] = attempt
+                return raw
             except anthropic.RateLimitError:
                 if attempt == max_retries:
                     raise
@@ -81,20 +83,18 @@ class ClaudeClient:
         self.max_tokens = int(agent["max_tokens"])
         self.effort = agent.get("effort")
         self.price = agent["pricing_usd_per_mtok"][model]
-        self.write_mult = float(agent["cache_write_multiplier"])
-        self.read_mult = float(agent["cache_read_multiplier"])
         self.cache_dir = Path(cache_dir)
         self.budget = budget or Budget(float(agent["budget_usd"]))
         self._send = send or _sdk_send(int(agent["max_retries"]), float(agent["backoff_base_s"]), sleep)
 
     def cost_of(self, usage: dict) -> float:
         u = {k: usage.get(k) or 0 for k in USAGE_KEYS}
-        tokens_in = (
-            u["input_tokens"]
-            + u["cache_creation_input_tokens"] * self.write_mult
-            + u["cache_read_input_tokens"] * self.read_mult
-        )
-        return (tokens_in * self.price["input"] + u["output_tokens"] * self.price["output"]) / 1e6
+        return (
+            u["input_tokens"] * self.price["input"]
+            + u["cache_creation_input_tokens"] * self.price["cache_write"]
+            + u["cache_read_input_tokens"] * self.price["cache_read"]
+            + u["output_tokens"] * self.price["output"]
+        ) / 1e6
 
     def create(self, system: str, messages: list, tools: list, repeat_index: int = 0, **_) -> dict:
         request = {
@@ -122,6 +122,7 @@ class ClaudeClient:
             "stop_reason": raw.get("stop_reason"),
             "usage": usage,
             "list_cost_usd": self.cost_of(usage),
+            "retries": raw.get("_retries", 0),
         }
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         tmp = path.with_suffix(".tmp")

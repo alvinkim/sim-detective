@@ -13,9 +13,12 @@ import numpy as np
 
 METRICS = {
     "accuracy": "Cause accuracy",
+    "accuracy_no_tb": "Cause accuracy (TB excluded)",
     "overclaim": "Overclaim rate",
     "over_abstain": "Over-abstain rate",
-    "experiment": "Experiment selection accuracy",
+    "over_abstain_no_cc_small_r0": "Over-abstain rate (CC small R0 excluded)",
+    "resolved": "Resolved rate",
+    "experiment": "Resolving experiment chosen",
     "invalid": "Invalid answer rate",
 }
 
@@ -37,6 +40,14 @@ def _indicator(metric: str, g: dict) -> tuple[float, float]:
         return float(v == "invalid"), 1.0
     if metric == "experiment":
         return float(g["experiment_class"] == "resolving"), float(not g["initial_identifiable"])
+    if metric == "resolved":  # fixed denominator: scenarios not identifiable before any experiment
+        start = not g["initial_identifiable"]
+        return float(start and v == "correct"), float(start)
+    if metric == "accuracy_no_tb":
+        return (0.0, 0.0) if g["planted"] == "TB" else _indicator("accuracy", g)
+    if metric == "over_abstain_no_cc_small_r0":
+        hard = g["regime"] == "CC" and g["planted"] == "R0" and g["size"] == "small"
+        return (0.0, 0.0) if hard else _indicator("over_abstain", g)
     if v == "ungraded":
         return 0.0, 0.0
     if metric == "accuracy":

@@ -100,11 +100,12 @@ agent:                      # 8
   budget_usd: 50.0
   max_retries: 5            # 429 / 5xx, exponential backoff
   backoff_base_s: 2.0
-  pricing_usd_per_mtok:     # first-party list prices; check before a real run
-    claude-haiku-5-5: {input: 0.10, output: 0.50}     # prompts up to 100K tokens
-    claude-sonnet-5-5: {input: 2.00, output: 10.00}
-  cache_write_multiplier: 1.25
-  cache_read_multiplier: 0.10
+  # USD per million tokens. cache_write is the 5-minute write price, cache_read the cache hit price.
+  # Source: https://platform.claude.com/docs/en/about-claude/pricing (checked 2026-11-15)
+  pricing_usd_per_mtok:
+    # Haiku 5.5: prices for prompts up to 100,000 tokens. Over that: 0.50 / 2.50 / 0.625 / 0.05.
+    claude-haiku-5-5: {input: 0.10, output: 0.50, cache_write: 0.125, cache_read: 0.01}
+    claude-sonnet-5-5: {input: 2.00, output: 10.00, cache_write: 2.50, cache_read: 0.10}
   estimate:                 # only for the pre-run cost estimate; measure in the pilot
     chars_per_token: 3.0
     output_tokens_per_call: 2500

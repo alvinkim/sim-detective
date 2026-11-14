@@ -51,7 +51,7 @@ def run_episode(
         resp = client.create(system=system, messages=messages, tools=tools,
                              repeat_index=repeat_index, scenario_id=public["id"])
         responses.append({k: resp.get(k) for k in
-                          ("model", "content", "stop_reason", "usage", "cached", "cost_usd", "request_sha")})
+                          ("model", "content", "stop_reason", "usage", "cached", "cost_usd", "request_sha", "retries")})
         for k in USAGE_KEYS:
             usage[k] += resp["usage"].get(k) or 0
         cost += resp["cost_usd"]

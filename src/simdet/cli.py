@@ -144,7 +144,7 @@ def cmd_run(args) -> int:
     with open(run_dir / "episodes.jsonl", "x", encoding="utf-8") as out:
         try:
             for m in models:
-                client = (make_mock(m, p.private) if m in MOCK_NAMES
+                client = (make_mock(m, p.private, cfg) if m in MOCK_NAMES
                           else ClaudeClient(m, cfg, p.cache, budget))
                 for cond in conditions:
                     done = 0
@@ -210,7 +210,7 @@ def cmd_cost(args) -> int:
     dirs = _run_dirs(paths(), args.run)
     if dirs is None:
         return 2
-    header = ["model", "cond", "episodes", "calls", "input_tok", "output_tok", "usd"]
+    header = ["model", "cond", "episodes", "calls", "retried", "input_tok", "output_tok", "usd"]
     rows = [header] + [[str(x) for x in r] for r in cost_rows(load_episodes(dirs))]
     widths = [max(len(r[i]) for r in rows) for i in range(len(header))]
     for r in rows:
@@ -224,7 +224,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     g = sub.add_parser("gen", help="generate and validate scenarios")
-    g.add_argument("--n", type=int, default=60)
+    g.add_argument("--n", type=int, default=72)
     g.add_argument("--seed", type=int, default=0)
     g.add_argument("--force", action="store_true", help="replace existing scenarios")
     g.add_argument("--save-on-check-failure", action="store_true",

@@ -39,15 +39,24 @@ def test_report_files(cfg, scenario_set, tmp_path):
     with open(run_dir / "episodes.jsonl", "w", encoding="utf-8") as f:
         for name in ("mock_always_claim", "mock_always_abstain"):
             client = make_mock(name)
-            for private in scenario_set["privates"][:12]:
+            for private in scenario_set["privates"]:
                 record = run_episode(client, cfg, scenario_set["publics"][private["id"]], "A")
                 record["grade"] = grade_episode(cfg, record, private)
                 f.write(dumps(record) + "\n")
-    out = write_report(cfg, [run_dir], run_dir, {"requested": 60, "generated": 60, "discarded": [],
+    out = write_report(cfg, [run_dir], run_dir, {"requested": 72, "generated": 72, "discarded": [],
                                                  "unfilled": [], "checks": []})
     for name in ("summary.md", "examples.md", "fig_overclaim.png", "fig_confusion.png", "fig_experiment.png"):
         assert (out / name).stat().st_size > 0
     summary = (out / "summary.md").read_text(encoding="utf-8")
     assert "Over-abstain rate" in summary and "mock_always_abstain" in summary
+    # follow-up T4: two extra columns and the per-stratum table
+    assert "Cause accuracy, TB excluded" in summary
+    assert "Over-abstain rate, CC small R0 excluded" in summary
+    assert "## Verdicts by regime, cause and size (episodes)" in summary
+    assert "| mock_always_claim | A | CC | R0 | small | 3 | 3 | 0 | 0 | 0 | 0 | 0 | 0 |" in summary
+    assert "| mock_always_abstain | A | DYN | TB | large | 3 | 0 | 0 | 3 | 0 | 0 | 0 | 0 |" in summary
+    # follow-up T5: resolved rate, and the note on the condition-B overclaim denominator
+    assert "| Model | Cond. | Resolved rate | Resolving experiment chosen |" in summary
+    assert "its denominator differs by model" in summary
     first = json.loads((run_dir / "episodes.jsonl").read_text(encoding="utf-8").splitlines()[0])
     assert {"responses", "answer", "grade", "usage", "cost_usd", "prompt_version"} <= set(first)

@@ -48,13 +48,36 @@ def _pct(r: dict) -> str:
     return f"{100 * r['rate']:.0f}% [{100 * r['lo']:.0f}, {100 * r['hi']:.0f}] (n={r['n']:g})"
 
 
-def _comparisons(groups: dict) -> list[tuple[tuple, tuple]]:
-    """Model pairs within a condition, then A vs B within a model."""
+def _comparisons(groups: dict) -> list[tuple[tuple, tuple, tuple[str, ...]]]:
+    """(first, second, metrics): model pairs within a condition, then A vs B within a model.
+
+    The overclaim rate is compared only inside condition A. In condition B its denominator
+    depends on what each model collected, so B comparisons use the resolved rate, whose
+    denominator is fixed."""
     keys = list(groups)
-    pairs = [(a, b) for i, a in enumerate(keys) for b in keys[i + 1:]
-             if a[1] == b[1] and a[0] != b[0]]
-    pairs += [(a, b) for a in keys for b in keys if a[0] == b[0] and a[1] == "A" and b[1] == "B"]
-    return pairs
+    out = []
+    for i, a in enumerate(keys):
+        for b in keys[i + 1:]:
+            if a[1] == b[1] and a[0] != b[0]:
+                third = "overclaim" if a[1] == "A" else "resolved"
+                out.append((a, b, ("accuracy", "over_abstain", third)))
+    out += [(a, b, ("accuracy", "over_abstain", "resolved"))
+            for a in keys for b in keys if a[0] == b[0] and a[1] == "A" and b[1] == "B"]
+    return out
+
+
+def breakdown_rows(groups: dict) -> list[list]:
+    """Per model and condition: verdict counts for every (regime, cause, size) stratum."""
+    rows = []
+    for (model, cond), eps in groups.items():
+        strata: dict[tuple, Counter] = defaultdict(Counter)
+        for e in eps:
+            g = e["grade"]
+            strata[(g["regime"], CAUSES.index(g["planted"]), g["size"] or "-")][g["verdict"]] += 1
+        for (regime, cause_i, size), c in sorted(strata.items()):
+            rows.append([model, cond, regime, CAUSES[cause_i], size, sum(c.values())]
+                        + [c.get(v, 0) for v in VERDICTS])
+    return rows
 
 
 def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_log: dict | None) -> str:
@@ -67,20 +90,42 @@ def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_l
         f"- runs: {', '.join(run_ids)}",
         f"- episodes: {len(episodes)}, scenarios: {n_scen}, prompt version: {', '.join(versions)}",
         "- Rates are over scenarios (repeats averaged per scenario first), with Wilson 95% intervals.",
-        "- In condition B the oracle is recomputed on the data the agent collected, so the "
-        "identifiable / not identifiable split differs by model.",
-        "- `mock_always_claim` and `mock_always_abstain` are baselines.",
+        "- `mock_always_claim`, `mock_always_abstain` and `mock_random_experiment` are baselines.",
         "",
         "## Metrics",
         "",
-        "| Model | Cond. | Cause accuracy (identifiable) | Overclaim rate (not identifiable) | "
-        "Over-abstain rate (identifiable) | Resolving experiment chosen (initially not identifiable) | Invalid |",
-        "|---|---|---|---|---|---|---|",
+        "| Model | Cond. | Cause accuracy (identifiable) | Cause accuracy, TB excluded | "
+        "Overclaim rate (not identifiable) | Over-abstain rate (identifiable) | "
+        "Over-abstain rate, CC small R0 excluded | Invalid |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for (model, cond), eps in groups.items():
         m = metrics_of(eps)
-        lines.append(f"| {model} | {cond} | {_pct(m['accuracy'])} | {_pct(m['overclaim'])} | "
-                     f"{_pct(m['over_abstain'])} | {_pct(m['experiment'])} | {_pct(m['invalid'])} |")
+        lines.append(f"| {model} | {cond} | {_pct(m['accuracy'])} | {_pct(m['accuracy_no_tb'])} | "
+                     f"{_pct(m['overclaim'])} | {_pct(m['over_abstain'])} | "
+                     f"{_pct(m['over_abstain_no_cc_small_r0'])} | {_pct(m['invalid'])} |")
+    lines += [
+        "",
+        "- In condition B the oracle is recomputed on the data the agent collected. The overclaim "
+        "rate in B is therefore taken over the scenarios that were still not identifiable after "
+        "that model's own experiments: its denominator differs by model, so do not compare it "
+        "between models. Use the resolved rate below.",
+        "- TB scenarios are easy (t_bias is 35 or 71 times SIGMA_T) and lift cause accuracy; CC "
+        "small R0 is hard (separated only by self-heating in T_meas) and an abstention there "
+        "counts as over-abstain. The two extra columns leave those strata out; grading is unchanged.",
+        "",
+        "## Scenarios that start not identifiable",
+        "",
+        "Both rates are over the scenarios that were not identifiable before any experiment, so the "
+        "denominator is the same for every model. Resolved = the final answer is judged correct "
+        "(only possible in condition B, after an experiment that leaves one cause).",
+        "",
+        "| Model | Cond. | Resolved rate | Resolving experiment chosen |",
+        "|---|---|---|---|",
+    ]
+    for (model, cond), eps in groups.items():
+        m = metrics_of(eps)
+        lines.append(f"| {model} | {cond} | {_pct(m['resolved'])} | {_pct(m['experiment'])} |")
 
     lines += ["", "## Verdict counts (episodes)", "",
               "| Model | Cond. | " + " | ".join(VERDICTS) + " | lucky overclaims | mean experiments |",
@@ -92,12 +137,19 @@ def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_l
         lines.append(f"| {model} | {cond} | " + " | ".join(str(c.get(v, 0)) for v in VERDICTS)
                      + f" | {lucky} | {mean_exp:.2f} |")
 
+    lines += ["", "## Verdicts by regime, cause and size (episodes)", "",
+              "| Model | Cond. | Regime | Cause | Size | n | " + " | ".join(VERDICTS) + " |",
+              "|---|---|---|---|---|---|" + "---|" * len(VERDICTS)]
+    for row in breakdown_rows(groups):
+        lines.append("| " + " | ".join(str(x) for x in row) + " |")
+
     lines += ["", "## Paired differences", "",
               f"Paired bootstrap over shared scenarios ({cfg['stats']['bootstrap_n']} resamples), "
-              "difference = first minus second, 95% interval.", "",
+              "difference = first minus second, 95% interval. Comparisons that involve condition B "
+              "use the resolved rate instead of the overclaim rate.", "",
               "| First | Second | Metric | Difference | Shared scenarios |", "|---|---|---|---|---|"]
-    for a, b in _comparisons(groups):
-        for metric in ("accuracy", "overclaim", "over_abstain"):
+    for a, b, metrics in _comparisons(groups):
+        for metric in metrics:
             d = stats.paired_bootstrap_diff(
                 stats.per_scenario(groups[a], metric), stats.per_scenario(groups[b], metric),
                 int(cfg["stats"]["bootstrap_n"]), int(cfg["stats"]["seed"]))
@@ -115,8 +167,8 @@ def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_l
                              f"{b['mean_confidence']:.2f} | {100 * b['accuracy']:.0f}% |")
 
     lines += ["", "## Tokens and cost", "",
-              "| Model | Cond. | Episodes | API calls | Input tokens | Output tokens | Cost (USD) |",
-              "|---|---|---|---|---|---|---|"]
+              "| Model | Cond. | Episodes | API calls | Retried calls (429/5xx) | Input tokens | Output tokens | Cost (USD) |",
+              "|---|---|---|---|---|---|---|---|"]
     for row in cost_rows(episodes):
         lines.append("| " + " | ".join(str(x) for x in row) + " |")
 
@@ -135,6 +187,10 @@ def summary_markdown(cfg, episodes: list[dict], run_ids: list[str], generation_l
     return "\n".join(lines) + "\n"
 
 
+def _retried(episodes: list[dict]) -> int:
+    return sum(bool(r.get("retries")) for e in episodes for r in e["responses"])
+
+
 def cost_rows(episodes: list[dict]) -> list[list]:
     rows = []
     total = 0.0
@@ -144,8 +200,10 @@ def cost_rows(episodes: list[dict]) -> list[list]:
         tout = sum(e["usage"]["output_tokens"] for e in eps)
         cost = sum(e["cost_usd"] for e in eps)
         total += cost
-        rows.append([model, cond, len(eps), sum(e["n_calls"] for e in eps), tin, tout, f"{cost:.4f}"])
-    rows.append(["total", "", len(episodes), sum(e["n_calls"] for e in episodes), "", "", f"{total:.4f}"])
+        rows.append([model, cond, len(eps), sum(e["n_calls"] for e in eps), _retried(eps), tin, tout,
+                     f"{cost:.4f}"])
+    rows.append(["total", "", len(episodes), sum(e["n_calls"] for e in episodes), _retried(episodes),
+                 "", "", f"{total:.4f}"])
     return rows
 
 

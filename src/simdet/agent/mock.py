@@ -6,8 +6,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-MOCK_NAMES = ("mock_always_claim", "mock_always_abstain", "mock_oracle")
-BASELINES = ("mock_always_claim", "mock_always_abstain")
+import random
+
+MOCK_NAMES = ("mock_always_claim", "mock_always_abstain", "mock_oracle", "mock_random_experiment")
+BASELINES = ("mock_always_claim", "mock_always_abstain", "mock_random_experiment")
 _ZERO = {"input_tokens": 0, "output_tokens": 0,
          "cache_creation_input_tokens": 0, "cache_read_input_tokens": 0}
 _FAULTS = ["r0_increase", "soc_offset", "temp_sensor_bias", "structural_change"]
@@ -97,11 +99,36 @@ class MockOracle:
         return _reply(self.name, "submit", answer, len(messages))
 
 
-def make_mock(name: str, private_dir: str | Path | None = None):
+class MockRandomExperiment:
+    """Baseline for experiment selection: abstains like mock_always_abstain but picks one
+    of the menu's representative experiments at random (fixed seed, so a rerun repeats)."""
+
+    name = "mock_random_experiment"
+
+    def __init__(self, cfg, seed: int = 0):
+        rep = cfg["experiments"]["representative"]
+        self._choices = [(name, dict(args)) for name, arg_list in rep.items() for args in arg_list]
+        self._seed = seed
+
+    def create(self, system, messages, tools, repeat_index=0, scenario_id=None, **_) -> dict:
+        rng = random.Random(f"{self._seed}:{scenario_id}:{repeat_index}")
+        name, args = rng.choice(self._choices)
+        if _can_experiment(tools, messages):
+            return _reply(self.name, "run_experiment", {"name": name, "args": args}, len(messages))
+        return _reply(self.name, "submit", {
+            "verdict": "not_identifiable", "cause": None, "candidates": list(_FAULTS),
+            "confidence": 0.5, "next_experiment": {"name": name, "args": args},
+            "rationale": "mock: abstains and picks a random experiment",
+        }, len(messages))
+
+
+def make_mock(name: str, private_dir: str | Path | None = None, cfg=None):
     if name == "mock_always_claim":
         return MockAlwaysClaim()
     if name == "mock_always_abstain":
         return MockAlwaysAbstain()
     if name == "mock_oracle":
         return MockOracle(private_dir)
+    if name == "mock_random_experiment":
+        return MockRandomExperiment(cfg)
     raise ValueError(f"unknown mock model: {name}")

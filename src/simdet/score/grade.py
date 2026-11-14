@@ -60,6 +60,7 @@ def grade_episode(cfg, record: dict, private: dict) -> dict:
         "lucky": lucky,
         "planted": cause,
         "regime": private["regime"],
+        "size": private["magnitude"]["size"],
         "answered": ("abstain" if not claimed else said_cause) if record["status"] == "answered" else None,
         "initial_identifiable": private["identifiable"],
         "final_identifiable": final_identifiable,

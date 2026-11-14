@@ -11,9 +11,9 @@ def cfg():
 
 @pytest.fixture(scope="session")
 def scenario_set(cfg, tmp_path_factory):
-    """The full 60-scenario set, generated once into a temporary directory."""
+    """The full 72-scenario set, generated once into a temporary directory."""
     root = tmp_path_factory.mktemp("scenarios")
-    result = g.generate(cfg, 60, 0)
+    result = g.generate(cfg, 72, 0)
     g.save(result, root)
     privates = [s["private"] for s in result["scenarios"]]
     publics = {s["public"]["id"]: s["public"] for s in result["scenarios"]}
