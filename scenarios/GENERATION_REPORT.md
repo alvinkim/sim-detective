@@ -196,3 +196,11 @@ CC regime의 R0와 TB 시나리오 12개가 `consistent_set` 크기 1로 나온�
 - 나머지 6개는 24개 모두 resolving이다.
 - 무작위 선택의 기대값은 187/216 = 87%다. 가장 짧은 "항상 resolving" 실험은 390 s다.
 
+## 수기 기록 (2026-11-15, 실제 실행)
+
+### 12. live 점검, pilot, 본 실행, model 추가
+
+- `pytest -m live` 5건 통과. `agent.thinking_display`를 `summarized`로 확정했다 (pilot 전). `thinking` 인자를 보내지 않아도 두 model이 빈 thinking block을 돌려주므로, 이 설정은 요약 글자를 받는지만 바꾼다.
+- pilot: `results/20261115-205152` (Haiku 5.5, 72개, A·B, 반복 1회). invalid 0건이라 수정하지 않았다. 이 시점부터 시나리오, 임계값, 채점 규칙, prompt는 동결이다.
+- 본 실행: `results/20261115-210426` (Haiku 5.5와 Sonnet 5.5, A·B, 반복 3회). Haiku의 반복 1회차는 pilot의 cache를 썼다.
+- **Opus 5.5는 사후에 추가했다.** 추가는 pilot 결과를 본 뒤, 본 실행(Sonnet)의 결과를 보기 전에 정했다. 설정은 같다 (같은 72개, prompt v2, effort medium, thinking 요약, 반복 3회). 바꾼 것은 config의 단가 한 줄뿐이다. 별도 run으로 실행하고 `simdet report --run`으로 합친다.
