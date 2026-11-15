@@ -1,0 +1,55 @@
+group,model,condition,scenario_id,repeat_index,planted,verdict,answered_cause,candidates,confidence,has_thinking_summary,has_text_block,type,saturation_mentioned,says_r0_and_soc_not_separated,note
+A_overclaim,claude-haiku-5-5,A,09df166c,0,ST,identified,soc_offset,,0.75,1,0,T1,no,no,flat offset taken as evidence against R2
+A_overclaim,claude-haiku-5-5,A,09df166c,2,ST,identified,soc_offset,,0.72,1,0,T3,no,yes,structural_change never mentioned
+A_overclaim,claude-haiku-5-5,A,0ecf604c,0,ST,identified,soc_offset,,0.72,1,0,T3,no,no,R2 appears only as an outcome of the proposed rest test
+A_overclaim,claude-haiku-5-5,A,0ecf604c,1,ST,identified,soc_offset,,0.7,1,0,T1,no,no,"""not a growing or structural effect"""
+A_overclaim,claude-haiku-5-5,A,0ecf604c,2,ST,identified,soc_offset,,0.7,1,0,T1,no,no,"R2 ""would show a changing residual"""
+A_overclaim,claude-haiku-5-5,A,1e1aa143,0,SOC0,identified,soc_offset,,0.7,1,0,T3,no,yes,structural_change never mentioned
+A_overclaim,claude-haiku-5-5,A,1e1aa143,2,SOC0,identified,soc_offset,,0.8,1,0,T2,partial,no,"""a structural R2 term at steady current could partly look similar"""
+A_overclaim,claude-haiku-5-5,A,4921f2d2,0,ST,identified,soc_offset,,0.8,1,0,T1,no,no,"""does not drift, so v1 and v2 are not implicated"""
+A_overclaim,claude-haiku-5-5,A,4921f2d2,2,ST,identified,soc_offset,,0.7,1,0,T1,no,yes,"R2 ""would show a transient decaying in time"""
+A_overclaim,claude-haiku-5-5,A,58b24e89,1,ST,identified,soc_offset,,0.7,1,0,T1,no,no,"R2 ""would show a slow, time-varying residual"""
+A_overclaim,claude-haiku-5-5,A,605ef500,0,ST,identified,soc_offset,,0.6,1,0,T1,no,yes,"R2 ""would show a slow extra transient"""
+A_overclaim,claude-haiku-5-5,A,605ef500,1,ST,identified,soc_offset,,0.8,1,0,T1,no,no,"R2 ""would give a drop that builds with time"""
+A_overclaim,claude-haiku-5-5,A,605ef500,2,ST,identified,soc_offset,,0.8,1,0,T1,no,no,"R2 ""would make the residual relax ... rather than hold flat"""
+A_overclaim,claude-haiku-5-5,A,87f8106e,1,SOC0,identified,soc_offset,,0.6,1,0,T1,no,no,"R2 ""would add a slowly growing v2 term"""
+A_overclaim,claude-haiku-5-5,A,8d3746a8,0,SOC0,identified,soc_offset,,0.8,1,0,T1,no,no,"""rules out a growing R2 term"""
+A_overclaim,claude-haiku-5-5,A,8d3746a8,2,SOC0,identified,soc_offset,,0.65,1,0,T3,no,no,structural_change never mentioned
+A_overclaim,claude-haiku-5-5,A,919757b6,1,SOC0,identified,soc_offset,,0.5,1,0,T2,yes,no,"""v2 is fully developed after 2400 s ... not fully excluded"""
+A_overclaim,claude-haiku-5-5,A,98acedd6,2,SOC0,identified,soc_offset,,0.8,1,0,T1,no,no,"R2 ""would build up a drifting v2 term"""
+A_overclaim,claude-haiku-5-5,A,a64582a6,1,SOC0,identified,soc_offset,,0.6,1,0,T1,no,no,"implicit: ""does not grow with time, so v1 and the RC dynamics look nominal"""
+A_overclaim,claude-haiku-5-5,A,b362f66c,1,ST,identified,soc_offset,,0.8,1,0,T3,no,no,structural_change never mentioned
+A_overclaim,claude-haiku-5-5,A,c3f80a56,2,SOC0,identified,soc_offset,,0.5,1,0,T2,yes,no,"""saturated after 2400 s of history, so structural_change is not excluded"""
+A_overclaim,claude-haiku-5-5,A,c53a6458,0,SOC0,identified,soc_offset,,0.7,1,0,T1,no,no,"""does not grow over time, so structural_change is unlikely"""
+A_overclaim,claude-haiku-5-5,A,da095ec6,0,ST,identified,soc_offset,,0.8,1,0,T1,no,no,"R2 ""starts at zero and builds with tau 300 s"""
+B_overclaim,claude-haiku-5-5,B,89d29f20,2,ST,identified,soc_offset,,0.8,1,0,T1,no,,
+B_overclaim,claude-haiku-5-5,B,98acedd6,2,SOC0,identified,soc_offset,,0.85,1,0,T3,no,,structural_change never mentioned
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,0ecf604c,0,ST,not_identifiable,,r0_increase+soc_offset,0.7,0,1,T1,no,,
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,0ecf604c,2,ST,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T1,no,,
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,4921f2d2,1,ST,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T1,no,,
+A_overclaim,claude-sonnet-5-5,A,58b24e89,0,ST,identified,soc_offset,,0.75,0,1,T1,no,no,"text: R2 ""would add a slowly rising residual"""
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,605ef500,0,ST,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T1,no,,structural_change only in the rationale
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,605ef500,1,ST,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T1,no,,
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,605ef500,2,ST,not_identifiable,,soc_offset+r0_increase,0.7,0,1,T3,no,,"structural_change never mentioned; ""2400 s of history means the v1 transient has already settled"""
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,79014f8e,0,SOC0,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T3,no,,structural_change never mentioned
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,79014f8e,1,SOC0,not_identifiable,,r0_increase+soc_offset,0.7,0,1,T1,no,,
+A_overclaim,claude-sonnet-5-5,A,87f8106e,1,SOC0,identified,soc_offset,,0.4,0,1,T2,yes,no,"text: ""By t = 2400 s it would be saturated ... not excluded by the data""; confidence 0.4"
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,88fe109c,0,SOC0,not_identifiable,,r0_increase+soc_offset,0.7,0,1,T3,no,,structural_change never mentioned
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,919757b6,2,SOC0,not_identifiable,,r0_increase+soc_offset,0.7,0,1,T2,yes,,"text: ""the history has already settled v2 to I*R2 ... consistent with a steady offset""; rationale drops it"
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,98acedd6,0,SOC0,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T1,partial,,"text: ""most of the R2 transient would have passed, but some drift would remain"""
+A_overclaim,claude-sonnet-5-5,A,a64582a6,1,SOC0,identified,soc_offset,,0.7,0,1,T1,no,no,"""already present at t=2400, which argues against structural_change"""
+A_overclaim,claude-sonnet-5-5,A,badebb59,1,ST,identified,soc_offset,,0.6,0,1,T3,no,yes,structural_change never mentioned
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,c53a6458,2,SOC0,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T3,no,,structural_change never mentioned
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,cc86d2dd,0,ST,not_identifiable,,r0_increase+soc_offset,0.6,0,1,T1,no,,
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,cc86d2dd,1,ST,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T2,yes,,"text: ""At t = 2400 s it is already near steady state ... could not be told apart from an offset""; rationale drops it"
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,d994a781,1,ST,not_identifiable,,soc_offset+r0_increase,0.7,0,1,T1,no,,text computes 1-exp(-t/300) from t=0 of the logged window
+A_abstain_R0_SOC0,claude-sonnet-5-5,A,d994a781,2,ST,not_identifiable,,r0_increase+soc_offset,0.8,0,1,T1,no,,
+A_overclaim,claude-sonnet-5-5,A,da095ec6,2,ST,identified,soc_offset,,0.85,0,1,T1,no,no,"""doesn't grow with time, which is not what structural_change would give"""
+B_overclaim,claude-sonnet-5-5,B,03b77d92,1,SOC0,identified,soc_offset,,0.7,0,1,T1,no,,
+B_overclaim,claude-sonnet-5-5,B,09df166c,0,ST,identified,soc_offset,,0.75,1,0,T1,no,,
+B_overclaim,claude-sonnet-5-5,B,09df166c,1,ST,identified,soc_offset,,0.75,1,0,T1,no,,
+B_overclaim,claude-sonnet-5-5,B,4921f2d2,0,ST,identified,soc_offset,,0.8,1,0,T1,no,,
+B_overclaim,claude-sonnet-5-5,B,88fe109c,2,SOC0,identified,soc_offset,,0.85,1,0,T1,no,,
+B_overclaim,claude-sonnet-5-5,B,98acedd6,0,SOC0,identified,soc_offset,,0.8,1,0,T1,no,,
+B_overclaim,claude-sonnet-5-5,B,d994a781,0,ST,identified,soc_offset,,0.8,1,0,T3,no,,"structural_change not named (""no transient or drift"")"
+B_overclaim,claude-sonnet-5-5,B,d994a781,2,ST,identified,soc_offset,,0.8,1,0,T1,no,,

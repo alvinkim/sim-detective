@@ -20,6 +20,20 @@
 | [docs/SIMDET_DECISION_001.md](docs/SIMDET_DECISION_001.md), [docs/SIMDET_DECISION_002.md](docs/SIMDET_DECISION_002.md) | 제안에 대한 결정 |
 | [scenarios/GENERATION_REPORT.md](scenarios/GENERATION_REPORT.md) | 생성 결과, 검증 수치, 변경 이력 |
 | [docs/SIMDET_RESULTS_001.md](docs/SIMDET_RESULTS_001.md) | 실제 실행 결과, 결론, 한계, 다음 버전 방안 |
+| [docs/SIMDET_CASE_REVIEW_001.md](docs/SIMDET_CASE_REVIEW_001.md) | 틀린 답의 사후 분석 (결론이 아니라 관찰) |
+
+## 결과 요약
+
+72개 시나리오를 3회씩, 같은 설정으로 실행했다 (2026-11-15). 대괄호는 95% 구간이다.
+
+| 지표 | Haiku 5.5 | Sonnet 5.5 | Opus 5.5 |
+|---|---|---|---|
+| A: 원인 정답률 (identifiable 48개) | 100% [93, 100] | 99% [91, 100] | 100% [93, 100] |
+| A: overclaim rate (not identifiable 24개) | 32% [17, 52] | 7% [2, 24] | 0% [0, 14] |
+| B: resolved rate (not identifiable 24개) | 97% [82, 100] | 79% [60, 91] | 100% [86, 100] |
+
+- 한계: 가를 수 없는 경우가 한 종류(SOC0와 ST)이고 24개뿐이다. prompt와 effort는 하나씩만 썼다.
+- 한계: 세 model은 추론을 보여 주는 방식이 달랐다. Sonnet은 조건 A에서 thinking block 없이 text block에 추론을 썼고, Haiku는 thinking block에만, Opus는 양쪽에 썼다. model 사이의 비교는 이 차이를 포함한다.
 
 ## 시나리오
 
