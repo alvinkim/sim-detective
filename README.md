@@ -19,6 +19,7 @@
 | [docs/SIMDET_IMPROVEMENT_PROPOSAL_001.md](docs/SIMDET_IMPROVEMENT_PROPOSAL_001.md) | 수정 보완 제안 (P1–P8) |
 | [docs/SIMDET_DECISION_001.md](docs/SIMDET_DECISION_001.md), [docs/SIMDET_DECISION_002.md](docs/SIMDET_DECISION_002.md) | 제안에 대한 결정 |
 | [scenarios/GENERATION_REPORT.md](scenarios/GENERATION_REPORT.md) | 생성 결과, 검증 수치, 변경 이력 |
+| [docs/SIMDET_RESULTS_001.md](docs/SIMDET_RESULTS_001.md) | 실제 실행 결과, 결론, 한계, 다음 버전 방안 |
 
 ## 시나리오
 
