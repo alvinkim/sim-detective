@@ -115,8 +115,8 @@ scenarios/private/        정답 (agent 모듈은 읽지 않는다. mock_oracle�
 
 ## 실제 실행 전에 확인할 것
 
-- 실제 API 호출은 이 저장소에서 아직 한 번도 실행하지 않았다. 먼저 `pytest -m live`로 API 경로를 점검한다.
-- `agent.thinking_display`는 기본값이 꺼짐(`null`)이다. `summarized`로 켜면 사례 검토에 쓸 추론 요약이 응답에 들어온다. live 테스트에서 두 model이 설정을 받는 것을 확인한 뒤, pilot 시작 전에 켤지 정하고 pilot과 본 실행에서 같은 값을 쓴다.
+- `pytest -m live`는 2026-11-15에 5건 모두 통과했다 (조건 A 1건, 조건 B는 두 model × thinking 요약 유무).
+- `agent.thinking_display`는 `summarized`로 확정했다 (2026-11-15, pilot 전). pilot과 본 실행에서 같은 값을 쓴다. `thinking` 인자를 보내지 않아도 두 model은 thinking block을 돌려주므로(내용은 비어 있음), 이 설정은 추론 여부가 아니라 요약 글자를 받는지만 바꾼다.
 - 단가(`agent.pricing_usd_per_mtok`)는 2026-11-15에 공식 가격 페이지에서 확인했다. `agent.effort`(기본 `medium`, 두 model에 같은 값)는 실행 전에 확인한다.
 - pilot 결과를 본 뒤에는 시나리오, 임계값, 채점 규칙, prompt를 바꾸지 않는다.
 - model이 거절했을 때 다른 model로 넘기는 server-side fallback은 켜지 않았다. 측정 대상 model이 바뀌면 안 되기 때문이다.

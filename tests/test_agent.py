@@ -153,11 +153,12 @@ def test_thinking_display_is_part_of_the_request(cfg, tmp_path):
         seen.append(request)
         return FakeSend()(request)
 
-    raw = copy.deepcopy(cfg.raw)
-    raw["agent"]["thinking_display"] = "summarized"
+    off, on = copy.deepcopy(cfg.raw), copy.deepcopy(cfg.raw)
+    off["agent"]["thinking_display"] = None
+    on["agent"]["thinking_display"] = "summarized"
     msgs = [{"role": "user", "content": "q"}]
-    ClaudeClient(MODEL, cfg, tmp_path / "c", Budget(50), send=send).create("s", msgs, [])
-    ClaudeClient(MODEL, Config(raw), tmp_path / "c", Budget(50), send=send).create("s", msgs, [])
+    ClaudeClient(MODEL, Config(off), tmp_path / "c", Budget(50), send=send).create("s", msgs, [])
+    ClaudeClient(MODEL, Config(on), tmp_path / "c", Budget(50), send=send).create("s", msgs, [])
     assert [r["thinking_display"] for r in seen] == [None, "summarized"]  # second is not a cache hit
 
 

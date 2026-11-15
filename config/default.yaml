@@ -117,7 +117,7 @@ agent:                      # 8
   # null = API default (reasoning text is not returned). "summarized" returns a summary of the
   # reasoning for case review; it changes what is shown, not how the model reasons. Decide before
   # the pilot and keep the same value for the pilot and the main run (SIMDET-DECISION-001/002).
-  thinking_display: null
+  thinking_display: summarized  # fixed on 2026-11-15 after the live check, before the pilot
   workers: 4                # episodes run in parallel; results are written in a fixed order
   max_calls_per_episode: 8
   budget_usd: 50.0
