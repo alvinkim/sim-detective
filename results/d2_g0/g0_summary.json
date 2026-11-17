@@ -1,0 +1,101 @@
+{
+ "precheck_dT_max_k": {
+  "30": 3.8110724833067593,
+  "40": 6.305906471605056,
+  "50": 9.026478091043657,
+  "60": 11.756916465124618,
+  "70": 14.337719305130463,
+  "80": 16.673645573034946
+ },
+ "twin_threshold_k": {
+  "T0": -3.3199581299533065,
+  "T1-0.1": -2.5612425461482644,
+  "T1-0.2": -1.4213943186683764,
+  "T1-0.3": -0.13496465656550072
+ },
+ "config": {
+  "plant": {
+   "dt_s": 1,
+   "command_period_s": 60,
+   "plan_len": 5,
+   "plans_per_episode": 12,
+   "soc_init": 0.5,
+   "soc_guard": [
+    0.25,
+    0.75
+   ],
+   "actuator_limit_a": 80,
+   "rated_continuous_a": 50,
+   "t_limit_k": 310.15
+  },
+  "request": {
+   "dwell_commands": [
+    1,
+    4
+   ],
+   "balance_band_soc": 0.1,
+   "balance_p_range": [
+    0.05,
+    0.95
+   ],
+   "kinds": {
+    "normal": {
+     "mag_range_a": [
+      5,
+      45
+     ],
+     "mag_step_a": 5.0
+    },
+    "heavy": {
+     "mag_range_a": [
+      40,
+      50
+     ],
+     "mag_step_a": 2.0
+    }
+   }
+  },
+  "policy": {
+   "tracking_sigma_a": 1.0,
+   "attack_start_plans": [
+    1,
+    2
+   ],
+   "a1": {
+    "mag_range_a": [
+     70,
+     80
+    ]
+   },
+   "a2": {
+    "gain_start": 1.0,
+    "gain_end": 1.6
+   },
+   "a3": {
+    "margin_k": 0.2,
+    "search_tol_a": 0.01,
+    "known_threshold_condition": "T0"
+   }
+  },
+  "twin_monitor": {
+   "hold_s": 300
+  },
+  "conditions": {
+   "T0": 0.0,
+   "T1-0.1": 0.1,
+   "T1-0.2": 0.2,
+   "T1-0.3": 0.3
+  },
+  "threshold": {
+   "false_stop_target": 0.05
+  },
+  "episodes": {
+   "seed": 20261118,
+   "B_cal": 40,
+   "B_test": 40,
+   "A1": 10,
+   "A2": 20,
+   "A3": 20
+  }
+ }
+}

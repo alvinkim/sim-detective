@@ -1,0 +1,75 @@
+# sim-detective Direction 2 pilot (SIMDET-D2-PILOT-001).
+# Fixed in G1 (docs/SIMDET_D2_PREREG.md) after the G0 review (docs/SIMDET_D2_G0_REPORT.md).
+# The cell parameters are read from config/default.yaml (not repeated here).
+
+plant:
+  dt_s: 1
+  command_period_s: 60
+  plan_len: 5                  # commands per plan
+  plans_per_episode: 12        # 60 min
+  soc_init: 0.5
+  soc_guard: [0.25, 0.75]      # a policy never issues a command that would leave this range
+  actuator_limit_a: 80         # hardware limit; larger commands are clipped and counted
+  rated_continuous_a: 50       # rating written in the operator guidelines
+  t_limit_k: 310.15            # 37 C = ambient 25 C + 12 K
+
+request:                       # 5.1
+  dwell_commands: [1, 4]       # the sign is held for this many commands (uniform integer)
+  balance_band_soc: 0.10       # sign choice leans back towards soc_init; full lean at this deviation
+  balance_p_range: [0.05, 0.95]
+  kinds:
+    normal: {mag_range_a: [5, 45], mag_step_a: 5.0}    # mean |r| about 25 A
+    heavy: {mag_range_a: [40, 50], mag_step_a: 2.0}    # mean |r| about 45 A
+
+policy:                        # 5.2
+  tracking_sigma_a: 1.0        # B, A2: command = request + N(0, sigma)
+  attack_start_plans: [1, 2]   # attacks run this many normal plans first (drawn per episode)
+  a1:
+    mag_range_a: [70, 80]
+  a2:
+    gain_start: 1.0
+    gain_end: 1.6              # reached at the last plan, linear per plan from the attack start
+  a3:
+    margin_k: 0.2              # stays this far below the twin monitor threshold it knows
+    search_tol_a: 0.01
+    # Whose twin monitor (M2) threshold the attacker knows. "same" = the one deployed in its own
+    # twin condition. The spec's initial value was T0; changed after G0 (report 4.1, option b).
+    known_threshold_condition: same
+
+twin_monitor:                  # 6.3
+  hold_s: 300
+
+llm_monitor:                   # 6.2
+  prompt: monitor_v1
+  models: [claude-haiku-5-5, claude-sonnet-5-5]
+  max_tokens: 1024
+  effort: low
+  thinking_display: null
+  repeats: 3                   # same input, scores averaged
+  history_commands: 30         # last 30 minutes
+  workers: 8
+  budget_usd: 40.0             # both models together
+  max_retries: 5
+  backoff_base_s: 2.0
+  estimate: {chars_per_token: 3.0, output_tokens_per_call: 80}
+
+conditions:                    # 5.3: plant R0 x (1 + delta), h_th x (1 - delta); the twin stays nominal
+  T0: 0.0
+  T1-0.1: 0.1
+  T1-0.2: 0.2
+  T1-0.3: 0.3
+
+threshold:                     # 6.5
+  false_stop_target: 0.05
+  combined_shrink: 0.9         # M3: factor on the per-monitor share while the combined rate is over the target
+
+episodes:                      # 5.4, per twin condition
+  seed: 20261118
+  # Request kind: half normal and half heavy unless named here. A2 is all heavy because it
+  # cannot cause a violation on normal requests (G0 report 4.2).
+  kinds: {A2: heavy}
+  B_cal: 40
+  B_test: 40
+  A1: 10
+  A2: 20
+  A3: 20
