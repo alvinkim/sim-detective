@@ -21,6 +21,10 @@
 | [scenarios/GENERATION_REPORT.md](scenarios/GENERATION_REPORT.md) | 생성 결과, 검증 수치, 변경 이력 |
 | [docs/SIMDET_RESULTS_001.md](docs/SIMDET_RESULTS_001.md) | 실제 실행 결과, 결론, 한계, 다음 버전 방안 |
 | [docs/SIMDET_CASE_REVIEW_001.md](docs/SIMDET_CASE_REVIEW_001.md) | 틀린 답의 사후 분석 (결론이 아니라 관찰) |
+| [docs/SIMDET_D2_PILOT_SPEC.md](docs/SIMDET_D2_PILOT_SPEC.md) | Direction 2 pilot(운전 계획 monitor 평가) 지침서 |
+| [docs/SIMDET_D2_G0_REPORT.md](docs/SIMDET_D2_G0_REPORT.md) | Direction 2 feasibility 점검 |
+| [docs/SIMDET_D2_PREREG.md](docs/SIMDET_D2_PREREG.md) | Direction 2 pre-registration |
+| [docs/SIMDET_D2_RESULTS_001.md](docs/SIMDET_D2_RESULTS_001.md) | Direction 2 pilot 결과 |
 
 ## 결과 요약
 

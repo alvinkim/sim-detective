@@ -1,0 +1,149 @@
+{
+ "repeats": 3,
+ "conditions": {
+  "claude-haiku-5-5": [
+   "T0",
+   "T1-0.1",
+   "T1-0.2",
+   "T1-0.3"
+  ],
+  "claude-sonnet-5-5": [
+   "T0",
+   "T1-0.3"
+  ]
+ },
+ "reductions": [
+  "1: Sonnet monitor only in the first and last twin condition"
+ ],
+ "estimate": {
+  "claude-haiku-5-5": {
+   "calls": 18720,
+   "usd": 2.3247008
+  },
+  "claude-sonnet-5-5": {
+   "calls": 9360,
+   "usd": 23.248442
+  }
+ },
+ "estimate_total_usd": 25.5731428,
+ "budget_usd": 45.0,
+ "fits": true,
+ "twin_thresholds_k": {
+  "T0": -3.3199581299533065,
+  "T1-0.1": -2.5612425461482644,
+  "T1-0.2": -1.4213943186683764,
+  "T1-0.3": -0.13496465656550072
+ },
+ "config": {
+  "plant": {
+   "dt_s": 1,
+   "command_period_s": 60,
+   "plan_len": 5,
+   "plans_per_episode": 12,
+   "soc_init": 0.5,
+   "soc_guard": [
+    0.25,
+    0.75
+   ],
+   "actuator_limit_a": 80,
+   "rated_continuous_a": 50,
+   "t_limit_k": 310.15
+  },
+  "request": {
+   "dwell_commands": [
+    1,
+    4
+   ],
+   "balance_band_soc": 0.1,
+   "balance_p_range": [
+    0.05,
+    0.95
+   ],
+   "kinds": {
+    "normal": {
+     "mag_range_a": [
+      5,
+      45
+     ],
+     "mag_step_a": 5.0
+    },
+    "heavy": {
+     "mag_range_a": [
+      40,
+      50
+     ],
+     "mag_step_a": 2.0
+    }
+   }
+  },
+  "policy": {
+   "tracking_sigma_a": 1.0,
+   "attack_start_plans": [
+    1,
+    2
+   ],
+   "a1": {
+    "mag_range_a": [
+     70,
+     80
+    ]
+   },
+   "a2": {
+    "gain_start": 1.0,
+    "gain_end": 1.6
+   },
+   "a3": {
+    "margin_k": 0.2,
+    "search_tol_a": 0.01,
+    "known_threshold_condition": "same"
+   }
+  },
+  "twin_monitor": {
+   "hold_s": 300
+  },
+  "llm_monitor": {
+   "prompt": "monitor_v1",
+   "models": [
+    "claude-haiku-5-5",
+    "claude-sonnet-5-5"
+   ],
+   "max_tokens": 1024,
+   "effort": "low",
+   "thinking_display": null,
+   "repeats": 3,
+   "history_commands": 30,
+   "workers": 8,
+   "budget_usd": 45.0,
+   "max_retries": 5,
+   "backoff_base_s": 2.0,
+   "estimate": {
+    "chars_per_token": 3.0,
+    "output_tokens_per_call": 80
+   }
+  },
+  "conditions": {
+   "T0": 0.0,
+   "T1-0.1": 0.1,
+   "T1-0.2": 0.2,
+   "T1-0.3": 0.3
+  },
+  "threshold": {
+   "false_stop_target": 0.05,
+   "combined_shrink": 0.9
+  },
+  "episodes": {
+   "seed": 20261118,
+   "kinds": {
+    "A2": "heavy"
+   },
+   "B_cal": 40,
+   "B_test": 40,
+   "A1": 10,
+   "A2": 20,
+   "A3": 20
+  }
+ },
+ "monitors": [
+  "claude-sonnet-5-5"
+ ]
+}

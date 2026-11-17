@@ -77,9 +77,13 @@ def main() -> None:
     ap.add_argument("--name", help="result directory name under results/d2_pilot (default: mock or live)")
     ap.add_argument("--config")
     ap.add_argument("--yes", action="store_true", help="really call the API")
+    ap.add_argument("--budget-usd", type=float,
+                    help="budget of this run instead of llm_monitor.budget_usd (recorded in plan.json)")
     args = ap.parse_args()
 
     cfg = load_control_config(args.config)
+    if args.budget_usd is not None:
+        cfg.raw["llm_monitor"]["budget_usd"] = args.budget_usd
     live = [m for m in args.monitor if m != monitor_llm.MOCK]
     unknown = [m for m in live if m not in cfg["llm_monitor"]["models"]]
     if unknown:

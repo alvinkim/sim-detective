@@ -36,7 +36,7 @@ def _record(cfg: ControlConfig, condition: str, set_name: str, index: int, kind:
         "dT_max_k": float(ep.temp.max() - cfg.cell.t_amb),
         "violation_time_s": ep.violation_time_s(cfg["plant"]["t_limit_k"]),
         "soc_min": float(ep.soc.min()), "soc_max": float(ep.soc.max()),
-        "twin_scores": ep.twin_scores,
+        "twin_scores": ep.twin_scores, "t_checkpoint": ep.t_checkpoint,
     }
 
 

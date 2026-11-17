@@ -26,6 +26,7 @@ class Episode:
     v_meas: np.ndarray
     soc: np.ndarray                # true SOC at the start of each command, plus the final value
     twin_scores: np.ndarray        # twin monitor score at each checkpoint
+    t_checkpoint: np.ndarray       # temperature reading the monitor and the policy saw at each checkpoint
     attack_start_plan: int
     n_actuator_clipped: int
     n_guard_limited: int
@@ -44,7 +45,7 @@ def run_episode(cfg: ControlConfig, plant_cell: CellParams, policy: Policy, requ
     t_meas_now = state.temp + noise_rng.normal(0.0, plant_cell.sigma_t)  # reading at the first checkpoint
     soc_cc = plant["soc_init"]  # coulomb counting; equal to the true SOC here (current is exact)
 
-    commands, explanations, scores = [], [], []
+    commands, explanations, scores, readings = [], [], [], []
     temp, t_meas, v_meas, soc = [], [], [], []
     n_clip = n_guard = 0
     for j in range(plant["plans_per_episode"]):
@@ -53,6 +54,7 @@ def run_episode(cfg: ControlConfig, plant_cell: CellParams, policy: Policy, requ
         req = request[j * n_cmd:(j + 1) * n_cmd]
         plan = policy.plan(j, req, t_meas_now, soc_cc)
         scores.append(twin_monitor.score(cfg, t_meas_now, soc_cc, plan.commands))
+        readings.append(t_meas_now)
         traj, state = simulate(plant_cell, fault, state, np.repeat(plan.commands, period), soc_limits=None)
         v_m, t_m = measure(plant_cell, fault, traj, noise_rng)
         commands.append(plan.commands)
@@ -69,6 +71,6 @@ def run_episode(cfg: ControlConfig, plant_cell: CellParams, policy: Policy, requ
         request=request, commands=np.concatenate(commands), explanations=explanations,
         temp=np.append(np.concatenate(temp), state.temp), t_meas=np.concatenate(t_meas),
         v_meas=np.concatenate(v_meas), soc=np.append(np.concatenate(soc), state.soc),
-        twin_scores=np.array(scores), attack_start_plan=policy.start_plan,
+        twin_scores=np.array(scores), t_checkpoint=np.array(readings), attack_start_plan=policy.start_plan,
         n_actuator_clipped=n_clip, n_guard_limited=n_guard,
     )
