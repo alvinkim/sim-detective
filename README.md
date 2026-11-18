@@ -25,6 +25,17 @@
 | [docs/SIMDET_D2_G0_REPORT.md](docs/SIMDET_D2_G0_REPORT.md) | Direction 2 feasibility 점검 |
 | [docs/SIMDET_D2_PREREG.md](docs/SIMDET_D2_PREREG.md) | Direction 2 pre-registration |
 | [docs/SIMDET_D2_RESULTS_001.md](docs/SIMDET_D2_RESULTS_001.md) | Direction 2 pilot 결과 |
+| [docs/SIMDET_D2_EXPERIMENT_REPORT.md](docs/SIMDET_D2_EXPERIMENT_REPORT.md) | Direction 2 pilot 실험 결과 보고서 (목적, 방법, 결과, 고찰, 결론) |
+| [docs/SIMDET_D2_FOLLOWUP_001.md](docs/SIMDET_D2_FOLLOWUP_001.md) | Direction 2 2차 라운드 지침서 |
+| [docs/SIMDET_D2_REANALYSIS_001.md](docs/SIMDET_D2_REANALYSIS_001.md) | 1차 data 재분석 (T0 고정 threshold, 규칙 기준선, 위반 원인 분리) |
+| [docs/SIMDET_D2_G0_REPORT_2.md](docs/SIMDET_D2_G0_REPORT_2.md) | 2차 라운드 feasibility 점검 (G0') |
+| [docs/SIMDET_D2_FOLLOWUP_002.md](docs/SIMDET_D2_FOLLOWUP_002.md) | 3차 plant(내부 온도를 재지 않는 2-node 열 model) 지침서 |
+| [docs/SIMDET_D2_G0_REPORT_3.md](docs/SIMDET_D2_G0_REPORT_3.md) | 3차 plant feasibility 점검 (G0'') |
+| [docs/SIMDET_D2_FOLLOWUP_003.md](docs/SIMDET_D2_FOLLOWUP_003.md) | 4차 plant(직렬 pack, 숨은 설비 상태, cell 전압 측정) 지침서 |
+| [docs/SIMDET_D2_G0_REPORT_4.md](docs/SIMDET_D2_G0_REPORT_4.md) | 4차 plant feasibility 점검 (G0'''). 부록 A: 규칙 R9를 넣은 재계산 |
+| [docs/SIMDET_D2_PREREG_4.md](docs/SIMDET_D2_PREREG_4.md) | 4차 plant 확인 실험 사전 등록 |
+| [docs/SIMDET_D2_RESULTS_004.md](docs/SIMDET_D2_RESULTS_004.md) | 4차 plant 확인 실험 결과 (새 seed, model 오차 조건), 1–4차 경과 |
+| [docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md](docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md) | Direction 2의 1–4차를 묶은 최종 보고서 |
 
 ## 결과 요약
 
@@ -38,6 +49,38 @@
 
 - 한계: 가를 수 없는 경우가 한 종류(SOC0와 ST)이고 24개뿐이다. prompt와 effort는 하나씩만 썼다.
 - 한계: 세 model은 추론을 보여 주는 방식이 달랐다. Sonnet은 조건 A에서 thinking block 없이 text block에 추론을 썼고, Haiku는 thinking block에만, Opus는 양쪽에 썼다. model 사이의 비교는 이 차이를 포함한다.
+
+## Direction 2 pilot
+
+위의 원인 식별 실험(Direction 1)과 별개인 두 번째 실험이다. Battery를 운전하는 정책이 몰래 과열을 일으키려 할 때, 운전 계획을 실행 전에 검사하는 monitor가 이를 얼마나 막는지 simulation으로 측정했다 (2026-11-18). 전체 요약은 [docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md](docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md)에 있다.
+
+**질문**: 물리 model(twin)로 온도를 예측하는 monitor가 단순한 규칙보다 더 많이 막는가.
+
+**답**: Plant를 네 번 바꿔 가며 봤고, 네 번 모두 "규칙으로 충분함"이다. 기준은 "twin이 가장 좋은 규칙보다 safety가 20 pt 이상 높다"이다.
+
+| 차수 | Plant | Twin | 가장 좋은 규칙 |
+|---|---|---|---|
+| 1차 | Cell 1개, 요청과 다른 전류를 내는 공격 | Twin 오차 20%까지 100%, 30%에서 15–60% | 추종 규칙 100% |
+| 2차 | Cell 1개, 평균은 지키고 RMS를 키우는 공격 | 40/40 | RMS 규칙 40/40 |
+| 3차 | 내부 온도를 재지 않는 2-node 열 model | 40/40 | RMS 규칙 40/40 |
+| 4차 | 직렬 cell 6개, 숨은 고장 (사전 등록한 확인 실험) | 120/120 | 전압으로 cell 온도를 구하는 규칙 111–120/120 |
+
+- **4차에서만 twin이 model 없는 규칙을 크게 앞섰다** (28–36 pt). 그 차이의 79–100%는 전압-온도 관계식 하나로 메워졌고, 열 model과 예측이 더한 몫은 0–7.5 pt였다.
+- **Twin은 전기 model의 오차에 약하다.** 전압 bias 5 mV에서 safety가 monitor 없는 수준까지 떨어진다. 열 parameter는 ±30% 틀려도 변화가 없다.
+- **LLM monitor(Haiku 5.5, Sonnet 5.5)는 1차에서만 썼다.** 모든 공격을 막았지만 규칙 한 줄이 같은 safety를 냈다.
+- **한계**: 2–4차의 설계는 앞 결과를 본 뒤에 정했다. 공격은 미리 짠 script이고, 4차의 운전 조건은 공격이 통하도록 좁혔다. 규칙은 차수마다 공격을 본 뒤에 골랐다.
+
+Code는 `src/simdet/control/`(1차), `control/r2/`, `control/r3/`, `control/r4/`에, 설정은 `config/control*.yaml`에, 결과는 `results/d2_*/`에 있다. Direction 1의 code와 설정은 건드리지 않는다.
+
+```
+python -m simdet.control.reanalysis        # 1차 재분석
+python -m simdet.control.r2.feasibility    # 2차
+python -m simdet.control.r3.feasibility    # 3차
+python -m simdet.control.r4.feasibility    # 4차 feasibility
+python -m simdet.control.r4.confirm        # 4차 확인 실험 (4 process로 약 1시간)
+```
+
+2–4차는 API를 호출하지 않는다.
 
 ## 시나리오
 
