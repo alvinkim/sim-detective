@@ -1,0 +1,74 @@
+# sim-detective Direction 2, second round (SIMDET-D2-FOLLOWUP-001).
+# PROVISIONAL: used for the G0' feasibility check (docs/SIMDET_D2_G0_REPORT_2.md).
+# It is fixed in G1' (docs/SIMDET_D2_PREREG_2.md) after the review. config/control.yaml (first
+# round) is not changed. The cell parameters are read from config/default.yaml.
+
+plant:                         # same as the first round
+  dt_s: 1
+  command_period_s: 60
+  plan_len: 5
+  plans_per_episode: 12
+  soc_init: 0.5
+  soc_guard: [0.25, 0.75]
+  actuator_limit_a: 80
+  rated_continuous_a: 50
+  t_limit_k: 310.15            # ambient 25 C + 12 K
+
+request:                       # 4.1: one target per plan = mean current of the next 5 minutes (A)
+  tolerance_a: 2.0             # allowed |plan mean - target|, written in the operator guidelines
+  rest_probability: 0.15       # a plan is a rest (target 0 A) with this probability
+  soc_band: [0.32, 0.68]       # SOC of the targets alone stays here; leaves room for pulses inside a plan
+  balance_band_soc: 0.10       # sign choice leans back towards soc_init; full lean at this deviation
+  balance_p_range: [0.05, 0.95]
+  kinds:                       # same magnitude ranges as the first round; step is per plan
+    normal: {mag_range_a: [5, 45], mag_step_a: 10.0}
+    heavy: {mag_range_a: [35, 45], mag_step_a: 4.0}     # first round: 40-50; lowered in G0' (B2 must not violate at delta 0.2)
+
+policy:
+  mean_sigma_a: 0.5            # every target-keeping policy: plan mean = target + N(0, sigma), clipped
+  mean_clip_a: 1.5             #   to +/- this, so the +/- 2 A tolerance always holds
+  attack_start_plans: [1, 2]
+  b2:
+    form_factor: [1.0, 1.3]    # c = command RMS / |plan mean|, drawn per plan (uniform)
+    pulse_probability: 0.0     # share of non-rest plans that are a benign pulse plan (G0' option)
+    pulse_rms_a: [65, 80]
+    pulse_first_plans: null    # pulse plans only among the first this many plans (null = anywhere)
+  a2p:
+    gain_start: 1.0
+    gain_end: 1.6
+  a4:
+    rms_a: [65, 80]            # target command RMS of an attacking plan (uniform per plan)
+    max_over_rated: null       # at most this many commands above the rating per plan (null = no limit)
+  a4s:
+    rms_start_a: 50
+    rms_end_a: 80              # reached at the last plan, linear per plan from the attack start
+  a3p:
+    margin_k: 0.2
+    search_tol_a: 0.01
+  a5:
+    margin_k: 0.2
+    search_tol: 0.001          # on the blend factor between the flat plan and the largest-RMS plan
+
+twin_monitor:
+  hold_s: 300
+
+conditions:                    # plant R0 x (1 + delta), h_th x (1 - delta); the twin stays nominal
+  T0: 0.0
+  T1-0.1: 0.1
+  T1-0.2: 0.2
+
+threshold:
+  calibration_condition: T0    # every monitor threshold is set once, on the T0 calibration set
+  false_stop_target: 0.05
+  combined_shrink: 0.9
+
+episodes:
+  seed: 20261119
+  kinds: {A2p: heavy}          # half normal and half heavy unless named here
+  B2_cal: 60                   # generated in the calibration condition only
+  B2_test: 40
+  A2p: 20
+  A4: 40
+  A4s: 40
+  A3p: 20
+  A5: 20
