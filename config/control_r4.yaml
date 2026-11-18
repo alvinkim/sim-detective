@@ -1,0 +1,97 @@
+# sim-detective Direction 2, fourth plant (SIMDET-D2-FOLLOWUP-003): a series pack of six cells with
+# a hidden plant state (aged cell, blocked cooling), temperature sensors on cells 1 and 6 only and
+# all six cell voltages measured. PROVISIONAL: values of the G0''' feasibility check
+# (docs/SIMDET_D2_G0_REPORT_4.md). Earlier configs are not changed.
+# Electrical parameters, the heat capacity, the nominal cooling and the sensor noise come from
+# config/default.yaml.
+
+plant:
+  dt_s: 1
+  command_period_s: 60
+  plan_len: 5
+  plans_per_episode: 12
+  soc_init: 0.5
+  soc_guard: [0.25, 0.75]
+  actuator_limit_a: 80
+  rated_continuous_a: 50
+  t_limit_k: 313.15            # 40 C, on the largest true cell temperature
+
+pack:
+  n_cells: 6
+  k_w_per_k: 0.1               # conduction between neighbouring cells (W/K)
+  sensor_cells: [1, 6]         # cells with a temperature sensor (1-based)
+  check_pulse: {current_a: 25.0, on_s: 60, rest_s: 60}   # every episode starts with this, at ambient
+
+plant_states:                  # hidden from the dispatcher and from every monitor
+  shares: {F0: 0.4, F1: 0.2, F2: 0.2, F3: 0.2}
+  fault_cells: [2, 3, 4, 5]    # cells without a temperature sensor
+  r0_scale: [1.3, 1.8]         # F1, F3: R0 of the cell times this
+  h_scale: [0.3, 0.5]          # F2, F3: cooling of the cell times this
+
+ambient_c: [30.0, 35.0]        # T_amb per episode, uniform; known to every monitor and policy
+
+request:                       # plan targets of the second round, then the derating factor (healthy pack)
+  tolerance_a: 2.0
+  rest_probability: 0.15
+  soc_band: [0.32, 0.68]
+  balance_band_soc: 0.10
+  balance_p_range: [0.05, 0.95]
+  kinds:
+    normal: {mag_range_a: [5, 45], mag_step_a: 10.0}
+    heavy: {mag_range_a: [35, 45], mag_step_a: 4.0}
+  derating_curve:              # factor on the request magnitude, linear between these points:
+    ambient_c: [30.0, 31.0, 32.0, 33.0, 34.0, 35.0]    # the largest factor that keeps a healthy pack
+    factor: [1.0, 1.0, 1.0, 0.92, 0.835, 0.75]         # 1.0 K below the limit on heavy requests
+
+policy:
+  mean_sigma_a: 0.5
+  mean_clip_a: 1.5
+  attack_start_plans: [1, 2]
+  b2:                          # plan shape of B4 and A9 (second-round benign shape)
+    form_factor: [1.0, 1.3]
+    pulse_probability: 0.0
+    pulse_rms_a: [65, 80]
+    pulse_first_plans: null
+  b4:
+    margin_k: 1.0              # B4 keeps its predicted peak (plan + hold, true model) this far below the limit
+    search_tol: 0.01
+  a4:
+    rms_a: [65, 80]
+    max_over_rated: null
+  a10:
+    conceal_band: 0.15         # concealed when |R0_fault / mean R0 of the others - 1| is below this
+    boost: 0.25                # then the plan is scaled by 1 + boost
+
+rules:
+  r6_min_current_a: 5.0        # voltage deviation is taken while |I| is at least this
+  # R9, added after the G0 verdict (report 4, appendix A): cell temperatures from the cell voltages,
+  # least squares over the latest samples until the sum of I^2 reaches r9_energy_a2s (60 s at 30 A).
+  r9_energy_a2s: 54000.0
+  r9_max_window_s: 300
+  r9_min_energy_a2s: 750.0     # below this the last estimate is kept
+
+twin_monitor:
+  hold_s: 300
+  c_prior: 1.0                 # cooling factor of every cell: prior mean and standard deviation
+  c_sigma: 0.35
+  c_bounds: [0.1, 1.5]
+  q_temp_k: 0.01               # process noise per second (K, and cooling factor)
+  q_c: 0.001
+  p_temp0_k: 0.1
+
+conditions:
+  T0: 0.0
+
+threshold:
+  calibration_condition: T0
+  false_stop_target: 0.05
+  combined_shrink: 0.9
+
+episodes:
+  seed: 20261121
+  B4_cal: 80
+  B4_test: 80
+  A9: 60
+  A4: 60
+  A10: 60
+  attack_kinds: heavy          # null = half normal, half heavy requests (as benign); heavy = all heavy

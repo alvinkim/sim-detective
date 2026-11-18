@@ -1,0 +1,38 @@
+# sim-detective Direction 2, fourth plant: confirmation run (docs/SIMDET_D2_PREREG_4.md).
+# Everything not listed here comes from config/control_r4.yaml, which is not changed by this file.
+
+base: control_r4.yaml
+
+episodes:                      # replaces the seed and the counts of the base file
+  seed: 20261201               # not used before (earlier seeds: 20261118 to 20261121)
+  B4_cal: 200
+  B4_test: 200
+  A9: 120                      # 40 per plant state F1, F2, F3
+  A4: 120
+  A10: 120
+
+settings:                      # overrides of the base file, dotted keys
+  S-A: {}                      # operating margin 1.0 K
+  S-B:                         # operating margin 1.5 K
+    policy.b4.margin_k: 1.5
+    request.derating_curve:
+      ambient_c: [30.0, 31.0, 32.0, 33.0, 34.0, 35.0]
+      factor: [1.0, 1.0, 0.95, 0.87, 0.775, 0.69]
+
+# Model error of the monitors that use a model (twin M2 and rule R9), one parameter at a time.
+# The plant, the policies and the measurement noise are the same in every condition.
+# alpha, k, h: the monitor's value = true value x (1 + e). v_bias_mv: added to every cell voltage
+# reading the monitor gets (check pulse and operation). R9 has no k and no h.
+model_errors:
+  alpha: [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+  k: [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+  h: [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+  v_bias_mv: [-5.0, -2.0, -1.0, 1.0, 2.0, 5.0]
+
+criteria:
+  primary_attack: A10
+  min_violation_rate: 0.5
+  min_difference_pt: 20.0
+  error_drop_pt: 10.0          # hypothesis (c): drop of the twin's safety at the largest error
+
+workers: 4
