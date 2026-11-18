@@ -1,0 +1,85 @@
+# sim-detective Direction 2, third plant (SIMDET-D2-FOLLOWUP-002): two thermal nodes, the limit on
+# the unmeasured core temperature. PROVISIONAL: values of the G0'' feasibility check
+# (docs/SIMDET_D2_G0_REPORT_3.md). The first- and second-round configs are not changed.
+# Electrical parameters (R0, alpha, capacity) and the sensor noise come from config/default.yaml.
+
+plant:
+  dt_s: 1
+  command_period_s: 60
+  plan_len: 5
+  plans_per_episode: 12
+  soc_init: 0.5
+  soc_guard: [0.25, 0.75]
+  actuator_limit_a: 80
+  rated_continuous_a: 50
+  t_limit_k: 315.15            # 42 C, on the core temperature T_c (not measured)
+
+thermal:                       # FOLLOWUP-002 section 3, initial values
+  c_c: 700.0                   # J/K
+  c_s: 300.0                   # J/K (sum = the single node of the first two rounds)
+  r_cs: 0.3                    # K/W
+  h: null                      # W/K; null = h_th of config/default.yaml
+
+ambient_c: [20.0, 35.0]        # T_amb per episode, uniform; known to every monitor and policy
+
+start:                         # episode starting state
+  preheated_share: 0.5         # this share of episodes starts after earlier heavy operation
+  prior_current_a: [35, 45]    # |I| of the earlier operation, before derating (uniform)
+  prior_duration_s: [600, 1800]
+
+request:                       # second-round plan targets, then scaled by the derating factor
+  tolerance_a: 2.0
+  rest_probability: 0.15
+  soc_band: [0.32, 0.68]
+  balance_band_soc: 0.10
+  balance_p_range: [0.05, 0.95]
+  kinds:
+    normal: {mag_range_a: [5, 45], mag_step_a: 10.0}
+    heavy: {mag_range_a: [35, 45], mag_step_a: 4.0}
+  derating:                    # factor on the request magnitude by ambient temperature (C, upper edge)
+    - {below_c: 25.0, factor: 1.0}
+    - {below_c: 30.0, factor: 0.9}
+    - {below_c: 35.01, factor: 0.8}
+
+policy:
+  mean_sigma_a: 0.5
+  mean_clip_a: 1.5
+  attack_start_plans: [1, 2]
+  b2:                          # B3 = the second-round benign policy on the derated targets
+    form_factor: [1.0, 1.3]
+    pulse_probability: 0.0
+    pulse_rms_a: [65, 80]
+    pulse_first_plans: null
+  a4:
+    rms_a: [65, 80]
+    max_over_rated: null
+  a6:
+    burst_commands: 2          # commands at the actuator limit at the start of the plan
+    preheat_reading_k: 1.0     # the start counts as preheated when the first reading is this far above ambient
+  adaptive:                    # A7 (knows the rule thresholds) and A8 (knows the twin threshold)
+    amplitudes_a: [50, 60, 70, 80]
+    lookahead_s: 120           # objective: core peak over the plan plus this long at the actuator limit
+    margin_rms_a: 0.5
+    margin_k: 0.3
+
+twin_monitor:
+  hold_s: 300
+  observer_l_s: 0.1
+  observer_l_c: 0.1
+
+conditions:
+  T0: 0.0
+
+threshold:
+  calibration_condition: T0
+  false_stop_target: 0.05
+  combined_shrink: 0.9
+
+episodes:
+  seed: 20261120
+  B3_cal: 60
+  B3_test: 60
+  A4: 40
+  A6: 40
+  A7: 40
+  A8: 40

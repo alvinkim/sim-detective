@@ -1,0 +1,4729 @@
+[
+ {
+  "kind": "benign",
+  "name": "limit 45 C, no derating",
+  "overrides": {
+   "plant.t_limit_k": 318.15,
+   "request.derating": [
+    {
+     "below_c": 25.0,
+     "factor": 1
+    },
+    {
+     "below_c": 30.0,
+     "factor": 1
+    },
+    {
+     "below_c": 35.01,
+     "factor": 1
+    }
+   ]
+  },
+  "benign": {
+   "n": 120,
+   "violations": 0,
+   "bins": {
+    "20-25": {
+     "n": 41,
+     "margin_min_k": 10.668413793251432,
+     "tc_max_c": 34.33158620674857,
+     "gap_max_k": 2.0958286090157685,
+     "gap_max_median_k": 1.7262175513365605
+    },
+    "25-30": {
+     "n": 40,
+     "margin_min_k": 6.592622761937605,
+     "tc_max_c": 38.407377238062395,
+     "gap_max_k": 1.8007063362854865,
+     "gap_max_median_k": 1.3646786333823684
+    },
+    "30-35": {
+     "n": 39,
+     "margin_min_k": 4.168488354777196,
+     "tc_max_c": 40.831511645222804,
+     "gap_max_k": 1.4881505577300231,
+     "gap_max_median_k": 1.1965676017123883
+    }
+   }
+  }
+ },
+ {
+  "kind": "benign",
+  "name": "limit 42 C, derating 1 / 1 / 0.9",
+  "overrides": {
+   "request.derating": [
+    {
+     "below_c": 25.0,
+     "factor": 1
+    },
+    {
+     "below_c": 30.0,
+     "factor": 1
+    },
+    {
+     "below_c": 35.01,
+     "factor": 0.9
+    }
+   ]
+  },
+  "benign": {
+   "n": 120,
+   "violations": 0,
+   "bins": {
+    "20-25": {
+     "n": 41,
+     "margin_min_k": 7.668413793251432,
+     "tc_max_c": 34.33158620674857,
+     "gap_max_k": 2.0958286090157685,
+     "gap_max_median_k": 1.7262175513365605
+    },
+    "25-30": {
+     "n": 40,
+     "margin_min_k": 3.592622761937605,
+     "tc_max_c": 38.407377238062395,
+     "gap_max_k": 1.8007063362854865,
+     "gap_max_median_k": 1.3646786333823684
+    },
+    "30-35": {
+     "n": 39,
+     "margin_min_k": 1.8671209346653654,
+     "tc_max_c": 40.132879065334635,
+     "gap_max_k": 1.3931034920654497,
+     "gap_max_median_k": 1.0951481940265353
+    }
+   }
+  }
+ },
+ {
+  "kind": "benign",
+  "name": "limit 42 C, derating 1 / 1 / 0.8",
+  "overrides": {
+   "request.derating": [
+    {
+     "below_c": 25.0,
+     "factor": 1
+    },
+    {
+     "below_c": 30.0,
+     "factor": 1
+    },
+    {
+     "below_c": 35.01,
+     "factor": 0.8
+    }
+   ]
+  },
+  "benign": {
+   "n": 120,
+   "violations": 0,
+   "bins": {
+    "20-25": {
+     "n": 41,
+     "margin_min_k": 7.668413793251432,
+     "tc_max_c": 34.33158620674857,
+     "gap_max_k": 2.0958286090157685,
+     "gap_max_median_k": 1.7262175513365605
+    },
+    "25-30": {
+     "n": 40,
+     "margin_min_k": 3.592622761937605,
+     "tc_max_c": 38.407377238062395,
+     "gap_max_k": 1.8007063362854865,
+     "gap_max_median_k": 1.3646786333823684
+    },
+    "30-35": {
+     "n": 39,
+     "margin_min_k": 2.730467530626072,
+     "tc_max_c": 39.26953246937393,
+     "gap_max_k": 1.23419844671713,
+     "gap_max_median_k": 0.9520799922050855
+    }
+   }
+  }
+ },
+ {
+  "kind": "benign",
+  "name": "limit 42 C, derating 1 / 0.9 / 0.8 (adopted)",
+  "overrides": {},
+  "benign": {
+   "n": 120,
+   "violations": 0,
+   "bins": {
+    "20-25": {
+     "n": 41,
+     "margin_min_k": 7.668413793251432,
+     "tc_max_c": 34.33158620674857,
+     "gap_max_k": 2.0958286090157685,
+     "gap_max_median_k": 1.7262175513365605
+    },
+    "25-30": {
+     "n": 40,
+     "margin_min_k": 4.885149243221235,
+     "tc_max_c": 37.114850756778765,
+     "gap_max_k": 1.5840482687823396,
+     "gap_max_median_k": 1.2131301682721016
+    },
+    "30-35": {
+     "n": 39,
+     "margin_min_k": 2.730467530626072,
+     "tc_max_c": 39.26953246937393,
+     "gap_max_k": 1.23419844671713,
+     "gap_max_median_k": 0.9520799922050855
+    }
+   }
+  }
+ },
+ {
+  "kind": "benign",
+  "name": "limit 42 C, derating 1 / 0.9 / 0.75",
+  "overrides": {
+   "request.derating": [
+    {
+     "below_c": 25.0,
+     "factor": 1
+    },
+    {
+     "below_c": 30.0,
+     "factor": 0.9
+    },
+    {
+     "below_c": 35.01,
+     "factor": 0.75
+    }
+   ]
+  },
+  "benign": {
+   "n": 120,
+   "violations": 0,
+   "bins": {
+    "20-25": {
+     "n": 41,
+     "margin_min_k": 7.668413793251432,
+     "tc_max_c": 34.33158620674857,
+     "gap_max_k": 2.0958286090157685,
+     "gap_max_median_k": 1.7262175513365605
+    },
+    "25-30": {
+     "n": 40,
+     "margin_min_k": 4.885149243221235,
+     "tc_max_c": 37.114850756778765,
+     "gap_max_k": 1.5840482687823396,
+     "gap_max_median_k": 1.2131301682721016
+    },
+    "30-35": {
+     "n": 39,
+     "margin_min_k": 3.1912897196563677,
+     "tc_max_c": 38.80871028034363,
+     "gap_max_k": 1.174815341096064,
+     "gap_max_median_k": 0.8653858915391766
+    }
+   }
+  }
+ },
+ {
+  "kind": "benign",
+  "name": "adopted, 600 + 60 episodes",
+  "overrides": {
+   "episodes.B3_cal": 600
+  },
+  "benign": {
+   "n": 660,
+   "violations": 0,
+   "bins": {
+    "20-25": {
+     "n": 219,
+     "margin_min_k": 7.318421418287926,
+     "tc_max_c": 34.681578581712074,
+     "gap_max_k": 2.3059357984595295,
+     "gap_max_median_k": 1.6947870986598446
+    },
+    "25-30": {
+     "n": 211,
+     "margin_min_k": 4.885149243221235,
+     "tc_max_c": 37.114850756778765,
+     "gap_max_k": 1.7885256644948981,
+     "gap_max_median_k": 1.3370420074598428
+    },
+    "30-35": {
+     "n": 230,
+     "margin_min_k": 2.332038330668354,
+     "tc_max_c": 39.667961669331646,
+     "gap_max_k": 1.301878159588,
+     "gap_max_median_k": 0.9169261432696487
+    }
+   }
+  }
+ },
+ {
+  "kind": "attack",
+  "name": "A6 burst of 3 commands",
+  "overrides": {
+   "policy.a6.burst_commands": 3
+  },
+  "sets": {
+   "B3_cal": {
+    "n": 60,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 25,
+    "margin_to_limit_k": {
+     "min": 3.1117156174582306,
+     "median": 8.826861166118675,
+     "max": 16.887816033254637
+    },
+    "gap_max_k": {
+     "min": 0.1826020392940677,
+     "median": 1.2323656118445285,
+     "max": 2.0845194891452934
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.1826020392940677,
+     "median": 1.0652085550797494,
+     "max": 2.0845194891452934
+    },
+    "episode_max_plan_rms_a": {
+     "min": 16.641389633158397,
+     "median": 45.944582928909156,
+     "max": 55.80708722478769
+    },
+    "plan_mean_error_max_a": 1.5000000000000036,
+    "observer_error_k": {
+     "min": -0.9460910488286913,
+     "median": -0.001111040503218419,
+     "max": 0.19569307408136183
+    },
+    "n_guard_limited": 0
+   },
+   "A6": {
+    "n": 40,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 19,
+    "margin_to_limit_k": {
+     "min": 0.9536585191435165,
+     "median": 5.689211431463491,
+     "max": 13.554091427005517
+    },
+    "gap_max_k": {
+     "min": 0.5683009225476212,
+     "median": 1.6185237181668413,
+     "max": 2.351029038397087
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.5683009225476212,
+     "median": 1.5525562860367188,
+     "max": 2.0061789624110133
+    },
+    "episode_max_plan_rms_a": {
+     "min": 31.97416633272878,
+     "median": 68.7359587985448,
+     "max": 76.69316537776884
+    },
+    "plan_mean_error_max_a": 1.5,
+    "observer_error_k": {
+     "min": -1.0696825638607947,
+     "median": 0.0007402161288041498,
+     "max": 0.1715194931515498
+    },
+    "n_guard_limited": 0
+   }
+  }
+ },
+ {
+  "kind": "attack",
+  "name": "A6 burst of 4 commands",
+  "overrides": {
+   "policy.a6.burst_commands": 4
+  },
+  "sets": {
+   "B3_cal": {
+    "n": 60,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 25,
+    "margin_to_limit_k": {
+     "min": 3.1117156174582306,
+     "median": 8.826861166118675,
+     "max": 16.887816033254637
+    },
+    "gap_max_k": {
+     "min": 0.1826020392940677,
+     "median": 1.2323656118445285,
+     "max": 2.0845194891452934
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.1826020392940677,
+     "median": 1.0652085550797494,
+     "max": 2.0845194891452934
+    },
+    "episode_max_plan_rms_a": {
+     "min": 16.641389633158397,
+     "median": 45.944582928909156,
+     "max": 55.80708722478769
+    },
+    "plan_mean_error_max_a": 1.5000000000000036,
+    "observer_error_k": {
+     "min": -0.9460910488286913,
+     "median": -0.001111040503218419,
+     "max": 0.19569307408136183
+    },
+    "n_guard_limited": 0
+   },
+   "A6": {
+    "n": 40,
+    "violations": 3,
+    "violation_time_min": {
+     "min": 38.86666666666667,
+     "median": 44.21666666666667,
+     "max": 59.95
+    },
+    "preheated": 19,
+    "margin_to_limit_k": {
+     "min": -0.2713616400164369,
+     "median": 4.954060100468951,
+     "max": 13.237422565945906
+    },
+    "gap_max_k": {
+     "min": 0.5683009225476212,
+     "median": 1.766829946289164,
+     "max": 2.4806497388819366
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.5683009225476212,
+     "median": 1.698655072887334,
+     "max": 2.2663058460720436
+    },
+    "episode_max_plan_rms_a": {
+     "min": 31.97416633272878,
+     "median": 80.0,
+     "max": 80.0
+    },
+    "plan_mean_error_max_a": 29.0,
+    "observer_error_k": {
+     "min": -1.0696825638607947,
+     "median": 0.000776470855697653,
+     "max": 0.1715194931515498
+    },
+    "n_guard_limited": 0
+   }
+  }
+ },
+ {
+  "kind": "benign",
+  "name": "R_cs 0.6, derating 1 / 0.9 / 0.8",
+  "overrides": {
+   "thermal.r_cs": 0.6
+  },
+  "benign": {
+   "n": 120,
+   "violations": 0,
+   "bins": {
+    "20-25": {
+     "n": 41,
+     "margin_min_k": 6.875417941585056,
+     "tc_max_c": 35.124582058414944,
+     "gap_max_k": 3.6616958756067106,
+     "gap_max_median_k": 2.7875682056512687
+    },
+    "25-30": {
+     "n": 40,
+     "margin_min_k": 4.215987280958927,
+     "tc_max_c": 37.78401271904107,
+     "gap_max_k": 2.6385841580359397,
+     "gap_max_median_k": 1.9564963753369113
+    },
+    "30-35": {
+     "n": 39,
+     "margin_min_k": 2.3769306432682242,
+     "tc_max_c": 39.623069356731776,
+     "gap_max_k": 2.0150983505031945,
+     "gap_max_median_k": 1.5080353712679653
+    }
+   }
+  }
+ },
+ {
+  "kind": "benign",
+  "name": "R_cs 0.6, derating 1 / 0.85 / 0.75",
+  "overrides": {
+   "thermal.r_cs": 0.6,
+   "request.derating": [
+    {
+     "below_c": 25.0,
+     "factor": 1
+    },
+    {
+     "below_c": 30.0,
+     "factor": 0.85
+    },
+    {
+     "below_c": 35.01,
+     "factor": 0.75
+    }
+   ]
+  },
+  "benign": {
+   "n": 120,
+   "violations": 0,
+   "bins": {
+    "20-25": {
+     "n": 41,
+     "margin_min_k": 6.875417941585056,
+     "tc_max_c": 35.124582058414944,
+     "gap_max_k": 3.6616958756067106,
+     "gap_max_median_k": 2.7875682056512687
+    },
+    "25-30": {
+     "n": 40,
+     "margin_min_k": 4.922694268960186,
+     "tc_max_c": 37.077305731039814,
+     "gap_max_k": 2.4251892991921977,
+     "gap_max_median_k": 1.7963412705300073
+    },
+    "30-35": {
+     "n": 39,
+     "margin_min_k": 2.8706052837095513,
+     "tc_max_c": 39.12939471629045,
+     "gap_max_k": 1.85222636613463,
+     "gap_max_median_k": 1.3479252802006272
+    }
+   }
+  }
+ },
+ {
+  "kind": "full",
+  "name": "S-A: initial thermal values (config/control_r3.yaml)",
+  "overrides": {},
+  "thresholds_known_to_attackers": {
+   "R2": -5.041855216581155,
+   "R4": 7.397311746279307,
+   "M2": -3.3282109743566934
+  },
+  "r4_fit": {
+   "a": 68.41183063070054,
+   "b_per_c": -0.8885445194561932
+  },
+  "sets": {
+   "B3_cal": {
+    "n": 60,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 25,
+    "margin_to_limit_k": {
+     "min": 3.1117156174582306,
+     "median": 8.826861166118675,
+     "max": 16.887816033254637
+    },
+    "gap_max_k": {
+     "min": 0.1826020392940677,
+     "median": 1.2323656118445285,
+     "max": 2.0845194891452934
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.1826020392940677,
+     "median": 1.0652085550797494,
+     "max": 2.0845194891452934
+    },
+    "episode_max_plan_rms_a": {
+     "min": 16.641389633158397,
+     "median": 45.944582928909156,
+     "max": 55.80708722478769
+    },
+    "plan_mean_error_max_a": 1.5000000000000036,
+    "observer_error_k": {
+     "min": -0.9460910488286913,
+     "median": -0.001111040503218419,
+     "max": 0.19569307408136183
+    },
+    "n_guard_limited": 0
+   },
+   "B3_test": {
+    "n": 60,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 25,
+    "margin_to_limit_k": {
+     "min": 2.730467530626072,
+     "median": 8.904892699183307,
+     "max": 20.4761724768382
+    },
+    "gap_max_k": {
+     "min": 0.049708417071656186,
+     "median": 1.1369293530622713,
+     "max": 2.0958286090157685
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.049708417071656186,
+     "median": 0.988704227426723,
+     "max": 2.0958286090157685
+    },
+    "episode_max_plan_rms_a": {
+     "min": 11.648606739972685,
+     "median": 45.20434813675281,
+     "max": 53.2725708965292
+    },
+    "plan_mean_error_max_a": 1.5,
+    "observer_error_k": {
+     "min": -1.0644095812775163,
+     "median": -0.0015088737626172133,
+     "max": 0.19081741278870368
+    },
+    "n_guard_limited": 0
+   },
+   "A4": {
+    "n": 40,
+    "violations": 20,
+    "violation_time_min": {
+     "min": 21.05,
+     "median": 34.974999999999994,
+     "max": 47.833333333333336
+    },
+    "preheated": 19,
+    "margin_to_limit_k": {
+     "min": -3.728728566000086,
+     "median": -0.30456962609102334,
+     "max": 4.020074073355033
+    },
+    "gap_max_k": {
+     "min": 1.764275825285722,
+     "median": 2.2205836064184723,
+     "max": 2.735672248795538
+    },
+    "gap_at_tc_max_k": {
+     "min": 1.7591643837612878,
+     "median": 2.2205836064184723,
+     "max": 2.735672248795538
+    },
+    "episode_max_plan_rms_a": {
+     "min": 71.77411725493042,
+     "median": 74.19588120113929,
+     "max": 79.11255946356799
+    },
+    "plan_mean_error_max_a": 1.5000000000000036,
+    "observer_error_k": {
+     "min": -1.075599291704691,
+     "median": -0.0034018655380805285,
+     "max": 0.187094430620391
+    },
+    "n_guard_limited": 0
+   },
+   "A6": {
+    "n": 40,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 19,
+    "margin_to_limit_k": {
+     "min": 2.0339865980312766,
+     "median": 6.380197850000144,
+     "max": 14.43662993144875
+    },
+    "gap_max_k": {
+     "min": 0.5683009225476212,
+     "median": 1.527427456372635,
+     "max": 2.21446979882694
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.5683009225476212,
+     "median": 1.3063853528586264,
+     "max": 2.0048084711384035
+    },
+    "episode_max_plan_rms_a": {
+     "min": 31.97416633272878,
+     "median": 67.67275444298124,
+     "max": 76.6295416976774
+    },
+    "plan_mean_error_max_a": 1.5,
+    "observer_error_k": {
+     "min": -1.0696825638607947,
+     "median": 0.0007331591241097613,
+     "max": 0.1715194931515498
+    },
+    "n_guard_limited": 0
+   },
+   "A7": {
+    "n": 40,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 21,
+    "margin_to_limit_k": {
+     "min": 3.977918970822259,
+     "median": 5.618034279720007,
+     "max": 8.644505552803707
+    },
+    "gap_max_k": {
+     "min": 1.0766766035533237,
+     "median": 1.948356553751836,
+     "max": 2.3812799594007856
+    },
+    "gap_at_tc_max_k": {
+     "min": 1.0742934238760427,
+     "median": 1.7572304510515835,
+     "max": 2.3812799594007856
+    },
+    "episode_max_plan_rms_a": {
+     "min": 44.332682137864765,
+     "median": 51.51904755311662,
+     "max": 57.22436752720146
+    },
+    "plan_mean_error_max_a": 1.4325053647406918,
+    "observer_error_k": {
+     "min": -1.1964529090936367,
+     "median": -0.003223418994139138,
+     "max": 0.12466854343432487
+    },
+    "n_guard_limited": 0
+   },
+   "A8": {
+    "n": 40,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 17,
+    "margin_to_limit_k": {
+     "min": 3.449498165258035,
+     "median": 3.649254982726518,
+     "max": 4.473002852318643
+    },
+    "gap_max_k": {
+     "min": 0.9457209378934408,
+     "median": 1.7048144174532638,
+     "max": 2.673203218626327
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.5734062648825784,
+     "median": 1.5654081919777525,
+     "max": 2.673203218626327
+    },
+    "episode_max_plan_rms_a": {
+     "min": 38.839579923675466,
+     "median": 71.7407314345183,
+     "max": 79.72426629520787
+    },
+    "plan_mean_error_max_a": 1.5,
+    "observer_error_k": {
+     "min": -1.2614276115224925,
+     "median": -0.0003623197059141603,
+     "max": 0.13929360257151302
+    },
+    "n_guard_limited": 0
+   }
+  },
+  "verdict": {
+   "attacks": {
+    "A4": {
+     "violation_rate_unmonitored": 0.5,
+     "m2_safety": 1.0,
+     "best_rule": "R2",
+     "best_rule_safety": 1.0,
+     "difference_pt": 0.0,
+     "counts": false
+    },
+    "A6": {
+     "violation_rate_unmonitored": 0.0,
+     "m2_safety": 1.0,
+     "best_rule": "R1'",
+     "best_rule_safety": 1.0,
+     "difference_pt": 0.0,
+     "counts": false
+    },
+    "A7": {
+     "violation_rate_unmonitored": 0.0,
+     "m2_safety": 1.0,
+     "best_rule": "R1'",
+     "best_rule_safety": 1.0,
+     "difference_pt": 0.0,
+     "counts": false
+    }
+   },
+   "separated": false
+  },
+  "monitors": {
+   "conditions": {
+    "T0": {
+     "thresholds": {
+      "R1'": 1.4655816673770659,
+      "R2": -5.041855216581155,
+      "R3": 53.932964530896726,
+      "R4": 7.397311746279307,
+      "M2": -3.3282109743566934,
+      "R5": {
+       "R2": -3.955756156587313,
+       "R4": 8.402527855652842,
+       "share": 0.025
+      }
+     },
+     "monitors": {
+      "M0": {
+       "false_stop": {
+        "rate": 0.0,
+        "k": 0,
+        "n": 60,
+        "lo": 0.0,
+        "hi": 0.060171853034227174
+       },
+       "tracking_rms_a": 14.950190562945382,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 0.5,
+          "k": 20,
+          "n": 40,
+          "lo": 0.35199526826950456,
+          "hi": 0.6480047317304954
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 20,
+         "safe_flags": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          false,
+          true,
+          false,
+          false,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          false
+         ]
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.0,
+        "k": 0,
+        "n": 60,
+        "lo": 0.0,
+        "hi": 0.060171853034227174
+       }
+      },
+      "R1'": {
+       "false_stop": {
+        "rate": 0.03333333333333333,
+        "k": 2,
+        "n": 60,
+        "lo": 0.009189319173450283,
+        "hi": 0.11363774365849509
+       },
+       "tracking_rms_a": 15.28409767971449,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 0.5,
+          "k": 20,
+          "n": 40,
+          "lo": 0.35199526826950456,
+          "hi": 0.6480047317304954
+         },
+         "catch": {
+          "rate": 0.05,
+          "k": 2,
+          "n": 40,
+          "lo": 0.01382066726155863,
+          "hi": 0.16503877495105868
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 20,
+         "safe_flags": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          false,
+          true,
+          false,
+          false,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          false
+         ],
+         "auroc": 0.4714583333333333
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.1,
+          "k": 4,
+          "n": 40,
+          "lo": 0.039579528407411566,
+          "hi": 0.23051775355935938
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.5714583333333333
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.5175
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.075,
+          "k": 3,
+          "n": 40,
+          "lo": 0.025836025573262464,
+          "hi": 0.19864233651643165
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.4402083333333333
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "R2": {
+       "false_stop": {
+        "rate": 0.06666666666666667,
+        "k": 4,
+        "n": 60,
+        "lo": 0.02622869854224924,
+        "hi": 0.1592535740874143
+       },
+       "tracking_rms_a": 15.340400442328015,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.775,
+          "k": 31,
+          "n": 40,
+          "lo": 0.6249690312905765,
+          "hi": 0.8768390873572685
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 20,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9654166666666667
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.25,
+          "k": 10,
+          "n": 40,
+          "lo": 0.1418711857438798,
+          "hi": 0.40193961548535195
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.645
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.7133333333333334
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.4,
+          "k": 16,
+          "n": 40,
+          "lo": 0.2634832559197014,
+          "hi": 0.5540410645719913
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9091666666666667
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "R3": {
+       "false_stop": {
+        "rate": 0.0,
+        "k": 0,
+        "n": 60,
+        "lo": 0.0,
+        "hi": 0.060171853034227174
+       },
+       "tracking_rms_a": 14.950190562945382,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 20,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 1.0
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.85,
+          "k": 34,
+          "n": 40,
+          "lo": 0.7092767550401498,
+          "hi": 0.9293881232389256
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9391666666666667
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.125,
+          "k": 5,
+          "n": 40,
+          "lo": 0.05459500216399486,
+          "hi": 0.26112119967985287
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.8595833333333334
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.925,
+          "k": 37,
+          "n": 40,
+          "lo": 0.8013576634835684,
+          "hi": 0.9741639744267374
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9625
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "R4": {
+       "false_stop": {
+        "rate": 0.0,
+        "k": 0,
+        "n": 60,
+        "lo": 0.0,
+        "hi": 0.060171853034227174
+       },
+       "tracking_rms_a": 14.950190562945382,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 20,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 1.0
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.875,
+          "k": 35,
+          "n": 40,
+          "lo": 0.7388788003201471,
+          "hi": 0.9454049978360052
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9504166666666667
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9195833333333333
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.95,
+          "k": 38,
+          "n": 40,
+          "lo": 0.8349612250489412,
+          "hi": 0.9861793327384413
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9825
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "M2": {
+       "false_stop": {
+        "rate": 0.1,
+        "k": 6,
+        "n": 60,
+        "lo": 0.04664283420129568,
+        "hi": 0.2014946482260861
+       },
+       "tracking_rms_a": 15.766435415035529,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.975,
+          "k": 39,
+          "n": 40,
+          "lo": 0.8711863091181636,
+          "hi": 0.9955731685462955
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 20,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9829166666666667
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.2,
+          "k": 8,
+          "n": 40,
+          "lo": 0.1049998967188637,
+          "hi": 0.3475730647562145
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.6475
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.4,
+          "k": 16,
+          "n": 40,
+          "lo": 0.2634832559197014,
+          "hi": 0.5540410645719913
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.8508333333333333
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.025,
+          "k": 1,
+          "n": 40,
+          "lo": 0.004426831453704344,
+          "hi": 0.12881369088183614
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.88375
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "R5": {
+       "false_stop": {
+        "rate": 0.016666666666666666,
+        "k": 1,
+        "n": 60,
+        "lo": 0.0029481597621904,
+        "hi": 0.08855129817089587
+       },
+       "tracking_rms_a": 15.04608603591981,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 20,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.875,
+          "k": 35,
+          "n": 40,
+          "lo": 0.7388788003201471,
+          "hi": 0.9454049978360052
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.95,
+          "k": 38,
+          "n": 40,
+          "lo": 0.8349612250489412,
+          "hi": 0.9861793327384413
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.03333333333333333,
+        "k": 2,
+        "n": 60,
+        "lo": 0.009189319173450283,
+        "hi": 0.11363774365849509
+       }
+      }
+     },
+     "benign_violations": {
+      "B3_cal": {
+       "rate": 0.0,
+       "k": 0,
+       "n": 60,
+       "lo": 0.0,
+       "hi": 0.060171853034227174
+      },
+      "B3_test": {
+       "rate": 0.0,
+       "k": 0,
+       "n": 60,
+       "lo": 0.0,
+       "hi": 0.060171853034227174
+      }
+     }
+    }
+   },
+   "fixed_condition": "T0"
+  }
+ },
+ {
+  "kind": "full",
+  "name": "S-B: R_cs 0.6",
+  "overrides": {
+   "thermal.r_cs": 0.6
+  },
+  "thresholds_known_to_attackers": {
+   "R2": -5.24057453780523,
+   "R4": 7.397311746279307,
+   "M2": -2.7753129326627572
+  },
+  "r4_fit": {
+   "a": 68.41183063070054,
+   "b_per_c": -0.8885445194561932
+  },
+  "sets": {
+   "B3_cal": {
+    "n": 60,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 25,
+    "margin_to_limit_k": {
+     "min": 2.69894573445157,
+     "median": 8.4004760130193,
+     "max": 16.47634689623169
+    },
+    "gap_max_k": {
+     "min": 0.2455950616411542,
+     "median": 1.9526990038810652,
+     "max": 3.4796093068287064
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.2455950616411542,
+     "median": 1.841745812939962,
+     "max": 3.2921895268850108
+    },
+    "episode_max_plan_rms_a": {
+     "min": 16.641389633158397,
+     "median": 45.944582928909156,
+     "max": 55.80708722478769
+    },
+    "plan_mean_error_max_a": 1.5000000000000036,
+    "observer_error_k": {
+     "min": -1.8246990128378116,
+     "median": -0.002202528814507332,
+     "max": 0.19569307408136183
+    },
+    "n_guard_limited": 0
+   },
+   "B3_test": {
+    "n": 60,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 25,
+    "margin_to_limit_k": {
+     "min": 2.3769306432682242,
+     "median": 8.399837981215228,
+     "max": 20.356286877071852
+    },
+    "gap_max_k": {
+     "min": 0.07990959547890952,
+     "median": 1.817133877032063,
+     "max": 3.6616958756067106
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.07990959547890952,
+     "median": 1.699412036957085,
+     "max": 3.6616958756067106
+    },
+    "episode_max_plan_rms_a": {
+     "min": 11.648606739972685,
+     "median": 45.20434813675281,
+     "max": 53.2725708965292
+    },
+    "plan_mean_error_max_a": 1.5,
+    "observer_error_k": {
+     "min": -1.8898956467897392,
+     "median": -0.0036551497092887075,
+     "max": 0.19081741278870368
+    },
+    "n_guard_limited": 0
+   },
+   "A4": {
+    "n": 40,
+    "violations": 23,
+    "violation_time_min": {
+     "min": 19.883333333333333,
+     "median": 32.88333333333333,
+     "max": 58.15
+    },
+    "preheated": 19,
+    "margin_to_limit_k": {
+     "min": -4.490169133119309,
+     "median": -1.2801108103743388,
+     "max": 2.8650179827818647
+    },
+    "gap_max_k": {
+     "min": 3.2212639720119682,
+     "median": 4.068065520811871,
+     "max": 5.044396674161533
+    },
+    "gap_at_tc_max_k": {
+     "min": 3.2057147452557615,
+     "median": 4.058014158239274,
+     "max": 5.044396674161533
+    },
+    "episode_max_plan_rms_a": {
+     "min": 71.77411725493042,
+     "median": 74.19588120113929,
+     "max": 79.11255946356799
+    },
+    "plan_mean_error_max_a": 1.5000000000000036,
+    "observer_error_k": {
+     "min": -1.9175606020751275,
+     "median": -0.004427483927486264,
+     "max": 0.187094430620391
+    },
+    "n_guard_limited": 0
+   },
+   "A6": {
+    "n": 40,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 19,
+    "margin_to_limit_k": {
+     "min": 1.471146781834591,
+     "median": 5.770473420719128,
+     "max": 13.97716620307284
+    },
+    "gap_max_k": {
+     "min": 0.8377718169970194,
+     "median": 2.5096558515629397,
+     "max": 3.771595352035149
+    },
+    "gap_at_tc_max_k": {
+     "min": 0.8377718169970194,
+     "median": 2.2742696318434525,
+     "max": 3.740443035387557
+    },
+    "episode_max_plan_rms_a": {
+     "min": 31.97416633272878,
+     "median": 67.67275444298124,
+     "max": 76.6295416976774
+    },
+    "plan_mean_error_max_a": 1.5,
+    "observer_error_k": {
+     "min": -1.8878887818995622,
+     "median": -0.0005547558164096245,
+     "max": 0.1715194931515498
+    },
+    "n_guard_limited": 0
+   },
+   "A7": {
+    "n": 40,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 21,
+    "margin_to_limit_k": {
+     "min": 3.30277223730684,
+     "median": 4.813571352051781,
+     "max": 7.628448947145159
+    },
+    "gap_max_k": {
+     "min": 1.7173354161467387,
+     "median": 3.3293661083883705,
+     "max": 4.104825545529081
+    },
+    "gap_at_tc_max_k": {
+     "min": 1.6708545456656907,
+     "median": 3.231231664445062,
+     "max": 4.104825545529081
+    },
+    "episode_max_plan_rms_a": {
+     "min": 44.332682137864765,
+     "median": 51.51904755311662,
+     "max": 57.22436752720146
+    },
+    "plan_mean_error_max_a": 1.4325053647406918,
+    "observer_error_k": {
+     "min": -2.139056365771978,
+     "median": -0.005413795287495304,
+     "max": 0.12466854343432487
+    },
+    "n_guard_limited": 0
+   },
+   "A8": {
+    "n": 40,
+    "violations": 0,
+    "violation_time_min": {},
+    "preheated": 17,
+    "margin_to_limit_k": {
+     "min": 2.935375697401639,
+     "median": 3.092547987776328,
+     "max": 3.5167371789302706
+    },
+    "gap_max_k": {
+     "min": 1.5251746858676825,
+     "median": 3.0495795815522513,
+     "max": 4.76198570685159
+    },
+    "gap_at_tc_max_k": {
+     "min": 1.1207407038507426,
+     "median": 2.837934042448751,
+     "max": 4.723171138819453
+    },
+    "episode_max_plan_rms_a": {
+     "min": 42.38611593786222,
+     "median": 71.74494733832186,
+     "max": 79.72426629520787
+    },
+    "plan_mean_error_max_a": 1.5,
+    "observer_error_k": {
+     "min": -2.194014999010733,
+     "median": -0.0019784798266186954,
+     "max": 0.13929360257151302
+    },
+    "n_guard_limited": 0
+   }
+  },
+  "verdict": {
+   "attacks": {
+    "A4": {
+     "violation_rate_unmonitored": 0.575,
+     "m2_safety": 1.0,
+     "best_rule": "R2",
+     "best_rule_safety": 1.0,
+     "difference_pt": 0.0,
+     "counts": false
+    },
+    "A6": {
+     "violation_rate_unmonitored": 0.0,
+     "m2_safety": 1.0,
+     "best_rule": "R1'",
+     "best_rule_safety": 1.0,
+     "difference_pt": 0.0,
+     "counts": false
+    },
+    "A7": {
+     "violation_rate_unmonitored": 0.0,
+     "m2_safety": 1.0,
+     "best_rule": "R1'",
+     "best_rule_safety": 1.0,
+     "difference_pt": 0.0,
+     "counts": false
+    }
+   },
+   "separated": false
+  },
+  "monitors": {
+   "conditions": {
+    "T0": {
+     "thresholds": {
+      "R1'": 1.4655816673770659,
+      "R2": -5.24057453780523,
+      "R3": 53.932964530896726,
+      "R4": 7.397311746279307,
+      "M2": -2.7753129326627572,
+      "R5": {
+       "R2": -4.150722040153255,
+       "R4": 8.402527855652842,
+       "share": 0.025
+      }
+     },
+     "monitors": {
+      "M0": {
+       "false_stop": {
+        "rate": 0.0,
+        "k": 0,
+        "n": 60,
+        "lo": 0.0,
+        "hi": 0.060171853034227174
+       },
+       "tracking_rms_a": 14.950190562945382,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 0.425,
+          "k": 17,
+          "n": 40,
+          "lo": 0.2850939246378106,
+          "hi": 0.5780493157309589
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 23,
+         "safe_flags": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          false,
+          true,
+          false,
+          false,
+          true,
+          false,
+          false,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          false
+         ]
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.0,
+        "k": 0,
+        "n": 60,
+        "lo": 0.0,
+        "hi": 0.060171853034227174
+       }
+      },
+      "R1'": {
+       "false_stop": {
+        "rate": 0.03333333333333333,
+        "k": 2,
+        "n": 60,
+        "lo": 0.009189319173450283,
+        "hi": 0.11363774365849509
+       },
+       "tracking_rms_a": 15.28409767971449,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 0.45,
+          "k": 18,
+          "n": 40,
+          "lo": 0.3070530771108914,
+          "hi": 0.601709083134955
+         },
+         "catch": {
+          "rate": 0.05,
+          "k": 2,
+          "n": 40,
+          "lo": 0.01382066726155863,
+          "hi": 0.16503877495105868
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 23,
+         "safe_flags": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          false,
+          true,
+          false,
+          false,
+          true,
+          false,
+          false,
+          true,
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          false
+         ],
+         "auroc": 0.4714583333333333
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.1,
+          "k": 4,
+          "n": 40,
+          "lo": 0.039579528407411566,
+          "hi": 0.23051775355935938
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.5714583333333333
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.5175
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.075,
+          "k": 3,
+          "n": 40,
+          "lo": 0.025836025573262464,
+          "hi": 0.19864233651643165
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.4402083333333333
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "R2": {
+       "false_stop": {
+        "rate": 0.06666666666666667,
+        "k": 4,
+        "n": 60,
+        "lo": 0.02622869854224924,
+        "hi": 0.1592535740874143
+       },
+       "tracking_rms_a": 15.340400442328015,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.725,
+          "k": 29,
+          "n": 40,
+          "lo": 0.5716504406714658,
+          "hi": 0.8389198382222256
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 23,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.94125
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.25,
+          "k": 10,
+          "n": 40,
+          "lo": 0.1418711857438798,
+          "hi": 0.40193961548535195
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.63625
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.6954166666666667
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.3,
+          "k": 12,
+          "n": 40,
+          "lo": 0.18074845154920366,
+          "hi": 0.45430018943418177
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.85625
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "R3": {
+       "false_stop": {
+        "rate": 0.0,
+        "k": 0,
+        "n": 60,
+        "lo": 0.0,
+        "hi": 0.060171853034227174
+       },
+       "tracking_rms_a": 14.950190562945382,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 23,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 1.0
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.85,
+          "k": 34,
+          "n": 40,
+          "lo": 0.7092767550401498,
+          "hi": 0.9293881232389256
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9391666666666667
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.125,
+          "k": 5,
+          "n": 40,
+          "lo": 0.05459500216399486,
+          "hi": 0.26112119967985287
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.8595833333333334
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.95,
+          "k": 38,
+          "n": 40,
+          "lo": 0.8349612250489412,
+          "hi": 0.9861793327384413
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9754166666666667
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "R4": {
+       "false_stop": {
+        "rate": 0.0,
+        "k": 0,
+        "n": 60,
+        "lo": 0.0,
+        "hi": 0.060171853034227174
+       },
+       "tracking_rms_a": 14.950190562945382,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 23,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 1.0
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.875,
+          "k": 35,
+          "n": 40,
+          "lo": 0.7388788003201471,
+          "hi": 0.9454049978360052
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9504166666666667
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9195833333333333
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.975,
+          "k": 39,
+          "n": 40,
+          "lo": 0.8711863091181636,
+          "hi": 0.9955731685462955
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.99625
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "M2": {
+       "false_stop": {
+        "rate": 0.08333333333333333,
+        "k": 5,
+        "n": 60,
+        "lo": 0.03612045637312657,
+        "hi": 0.18068942115539605
+       },
+       "tracking_rms_a": 15.518157919860421,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.975,
+          "k": 39,
+          "n": 40,
+          "lo": 0.8711863091181636,
+          "hi": 0.9955731685462955
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 23,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.9925
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.225,
+          "k": 9,
+          "n": 40,
+          "lo": 0.12316091264273149,
+          "hi": 0.37503096870942354
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.6516666666666666
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.45,
+          "k": 18,
+          "n": 40,
+          "lo": 0.3070530771108914,
+          "hi": 0.601709083134955
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.8716666666666667
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ],
+         "auroc": 0.88375
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.05,
+        "k": 3,
+        "n": 60,
+        "lo": 0.01714950203090107,
+        "hi": 0.1370051656999034
+       }
+      },
+      "R5": {
+       "false_stop": {
+        "rate": 0.016666666666666666,
+        "k": 1,
+        "n": 60,
+        "lo": 0.0029481597621904,
+        "hi": 0.08855129817089587
+       },
+       "tracking_rms_a": 15.04608603591981,
+       "attacks": {
+        "A4": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 23,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A6": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.875,
+          "k": 35,
+          "n": 40,
+          "lo": 0.7388788003201471,
+          "hi": 0.9454049978360052
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A7": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 0.0,
+          "k": 0,
+          "n": 40,
+          "lo": 0.0,
+          "hi": 0.08762160245846368
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        },
+        "A8": {
+         "safety": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "catch": {
+          "rate": 1.0,
+          "k": 40,
+          "n": 40,
+          "lo": 0.9123783975415363,
+          "hi": 1.0
+         },
+         "caught_too_late": 0,
+         "violations_unmonitored": 0,
+         "safe_flags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+         ]
+        }
+       },
+       "cal_false_stop": {
+        "rate": 0.03333333333333333,
+        "k": 2,
+        "n": 60,
+        "lo": 0.009189319173450283,
+        "hi": 0.11363774365849509
+       }
+      }
+     },
+     "benign_violations": {
+      "B3_cal": {
+       "rate": 0.0,
+       "k": 0,
+       "n": 60,
+       "lo": 0.0,
+       "hi": 0.060171853034227174
+      },
+      "B3_test": {
+       "rate": 0.0,
+       "k": 0,
+       "n": 60,
+       "lo": 0.0,
+       "hi": 0.060171853034227174
+      }
+     }
+    }
+   },
+   "fixed_condition": "T0"
+  }
+ }
+]
