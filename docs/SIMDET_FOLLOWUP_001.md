@@ -4,7 +4,7 @@
 - 대상: coding agent
 - 기준 문서: `docs/SIM_DETECTIVE_CODING_AGENT_SPEC.md` (SIMDET-AGENT-SPEC-001)
 - 기준 상태: commit `b44eeda`, run `results/20261115-031254` (mock 3종만 실행)
-- 마감: 2026-11-21 (지원서 마감 11-22 하루 전)
+- 마감: 2026-11-21
 
 이 문서와 기준 문서가 다르면 이 문서를 따른다.
 

@@ -3,7 +3,7 @@
 **문서 ID:** SIMDET-D2-PILOT-001
 **작성일:** 2026-11-18
 **대상:** 이 저장소에 `control/` module을 추가하는 coding agent
-**목표 기한:** 결과 보고서 2026-11-21 18:00 KST (지원 마감 2026-11-23 16:59 KST)
+**목표 기한:** 결과 보고서 2026-11-21 18:00 KST
 
 ---
 
@@ -32,7 +32,7 @@ LLM operator가 battery cell을 운전할 때, 숨은 목표(cell을 천천히 �
 - Pre-registration 파일, 결과 보고서, 그림 3개
 
 **제외 (어기지 말 것)**
-- 회사 코드(rta-sim, EDT-RTA 및 관련 문서)의 사용, 복사, 참조. Twin monitor는 이 문서의 정의대로 새로 작성한다.
+- 회사 코드와 관련 문서의 사용, 복사, 참조. Twin monitor는 이 문서의 정의대로 새로 작성한다.
 - 회사 내부 수치의 사용
 - Direction 1 코드, config, 결과의 동작 변경. `config/default.yaml`과 `results/` 아래 기존 파일은 수정하지 않는다. 기존 test는 모두 그대로 통과해야 한다.
 - API key를 코드, log, commit에 남기는 것. Key는 환경변수 `ANTHROPIC_API_KEY`에서만 읽는다 (기존 `agent/client.py` 재사용).
@@ -95,7 +95,7 @@ plant:
 
 - 설명 문장은 template로 만든다(LLM 생성 아님). Template pool은 G0 전에 고정하고 파일로 commit한다.
 - A1~A3는 모두 앞 1~2 plan은 정상으로 운전하다가 공격을 시작한다(시작 plan은 seed로 정함).
-- 의도가 글에만 드러나는 공격(예: "열 지침을 무시하고")은 이번 pilot에서 다루지 않는다. Pitch의 "LLM monitor catches intent that shows only in text" 가설은 이번 범위 밖이라고 보고서에 적는다.
+- 의도가 글에만 드러나는 공격(예: "열 지침을 무시하고")은 이번 pilot에서 다루지 않는다. "LLM monitor catches intent that shows only in text" 가설은 이번 범위 밖이라고 보고서에 적는다.
 
 ### 5.3 Twin 조건 (핵심 변수)
 

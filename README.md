@@ -1,185 +1,190 @@
 # sim-detective
 
-숨겨진 물리 시스템(배터리 cell 1개)의 측정 data를 AI agent에게 주고 다음을 측정한다.
+한국어: [README.ko.md](README.ko.md)
 
-1. 원인이 data에 드러날 때 원인을 맞히는가
-2. data가 원인을 가르지 못할 때 그렇게 답하는가
-3. (보조) 원인을 가를 수 있는 실험을 고르는가
+Two small experiments on a simulated battery, where the simulator knows the ground truth and can therefore grade answers that are otherwise hard to grade.
 
-정답은 simulator에 심은 원인과, 수치로 계산한 identifiability(oracle)로 정한다.
+- **Direction 1 (cause identification).** An AI agent gets measurement data from a battery cell with a hidden fault. Does it name the right cause when the data show it, and does it say "the data cannot tell" when they cannot?
+- **Direction 2 (plan monitoring, pilot).** A scripted control policy tries to overheat a battery. Does a monitor that predicts temperature with a physical model (a "twin") stop more attacks than a simple rule?
 
-## 문서
+Both are offline evaluations on a deliberately simple plant. This is individual work and has not been peer reviewed. Read [Limitations and disclosures](#limitations-and-disclosures) before quoting any number.
 
-뒤의 문서가 앞의 문서와 다르면 뒤의 문서를 따른다.
+## Key results
 
-| 문서 | 내용 |
-|---|---|
-| [docs/SIM_DETECTIVE_CODING_AGENT_SPEC.md](docs/SIM_DETECTIVE_CODING_AGENT_SPEC.md) | 처음의 설계 |
-| [docs/SIMDET_FOLLOWUP_001.md](docs/SIMDET_FOLLOWUP_001.md) | CC의 aliasing을 SOC0와 ST로 확정, 72개 시나리오, 조건 B 지표 |
-| [docs/SIMDET_IMPROVEMENT_PROPOSAL_001.md](docs/SIMDET_IMPROVEMENT_PROPOSAL_001.md) | 수정 보완 제안 (P1–P8) |
-| [docs/SIMDET_DECISION_001.md](docs/SIMDET_DECISION_001.md), [docs/SIMDET_DECISION_002.md](docs/SIMDET_DECISION_002.md) | 제안에 대한 결정 |
-| [scenarios/GENERATION_REPORT.md](scenarios/GENERATION_REPORT.md) | 생성 결과, 검증 수치, 변경 이력 |
-| [docs/SIMDET_RESULTS_001.md](docs/SIMDET_RESULTS_001.md) | 실제 실행 결과, 결론, 한계, 다음 버전 방안 |
-| [docs/SIMDET_CASE_REVIEW_001.md](docs/SIMDET_CASE_REVIEW_001.md) | 틀린 답의 사후 분석 (결론이 아니라 관찰) |
-| [docs/SIMDET_D2_PILOT_SPEC.md](docs/SIMDET_D2_PILOT_SPEC.md) | Direction 2 pilot(운전 계획 monitor 평가) 지침서 |
-| [docs/SIMDET_D2_G0_REPORT.md](docs/SIMDET_D2_G0_REPORT.md) | Direction 2 feasibility 점검 |
-| [docs/SIMDET_D2_PREREG.md](docs/SIMDET_D2_PREREG.md) | Direction 2 pre-registration |
-| [docs/SIMDET_D2_RESULTS_001.md](docs/SIMDET_D2_RESULTS_001.md) | Direction 2 pilot 결과 |
-| [docs/SIMDET_D2_EXPERIMENT_REPORT.md](docs/SIMDET_D2_EXPERIMENT_REPORT.md) | Direction 2 pilot 실험 결과 보고서 (목적, 방법, 결과, 고찰, 결론) |
-| [docs/SIMDET_D2_FOLLOWUP_001.md](docs/SIMDET_D2_FOLLOWUP_001.md) | Direction 2 2차 라운드 지침서 |
-| [docs/SIMDET_D2_REANALYSIS_001.md](docs/SIMDET_D2_REANALYSIS_001.md) | 1차 data 재분석 (T0 고정 threshold, 규칙 기준선, 위반 원인 분리) |
-| [docs/SIMDET_D2_G0_REPORT_2.md](docs/SIMDET_D2_G0_REPORT_2.md) | 2차 라운드 feasibility 점검 (G0') |
-| [docs/SIMDET_D2_FOLLOWUP_002.md](docs/SIMDET_D2_FOLLOWUP_002.md) | 3차 plant(내부 온도를 재지 않는 2-node 열 model) 지침서 |
-| [docs/SIMDET_D2_G0_REPORT_3.md](docs/SIMDET_D2_G0_REPORT_3.md) | 3차 plant feasibility 점검 (G0'') |
-| [docs/SIMDET_D2_FOLLOWUP_003.md](docs/SIMDET_D2_FOLLOWUP_003.md) | 4차 plant(직렬 pack, 숨은 설비 상태, cell 전압 측정) 지침서 |
-| [docs/SIMDET_D2_G0_REPORT_4.md](docs/SIMDET_D2_G0_REPORT_4.md) | 4차 plant feasibility 점검 (G0'''). 부록 A: 규칙 R9를 넣은 재계산 |
-| [docs/SIMDET_D2_PREREG_4.md](docs/SIMDET_D2_PREREG_4.md) | 4차 plant 확인 실험 사전 등록 |
-| [docs/SIMDET_D2_RESULTS_004.md](docs/SIMDET_D2_RESULTS_004.md) | 4차 plant 확인 실험 결과 (새 seed, model 오차 조건), 1–4차 경과 |
-| [docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md](docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md) | Direction 2의 1–4차를 묶은 최종 보고서 |
+### Direction 1
 
-## 결과 요약
+72 scenarios (48 where the cause is identifiable from the data, 24 where it is not), 3 repeats each, same prompt and settings for every model, run on 2026-11-15. Brackets are 95% intervals over scenarios.
 
-72개 시나리오를 3회씩, 같은 설정으로 실행했다 (2026-11-15). 대괄호는 95% 구간이다.
-
-| 지표 | Haiku 5.5 | Sonnet 5.5 | Opus 5.5 |
+| Metric | `claude-haiku-5-5` | `claude-sonnet-5-5` | `claude-opus-5-5` |
 |---|---|---|---|
-| A: 원인 정답률 (identifiable 48개) | 100% [93, 100] | 99% [91, 100] | 100% [93, 100] |
-| A: overclaim rate (not identifiable 24개) | 32% [17, 52] | 7% [2, 24] | 0% [0, 14] |
-| B: resolved rate (not identifiable 24개) | 97% [82, 100] | 79% [60, 91] | 100% [86, 100] |
+| Data only: correct cause, identifiable scenarios (48) | 100% [93, 100] | 99% [91, 100] | 100% [93, 100] |
+| Data only: abstained although identifiable (48) | 0% [0, 7] | 1% [0, 9] | 0% [0, 7] |
+| **Data only: named one cause although not identifiable, "overclaim" (24)** | **32% [17, 52]** | **7% [2, 24]** | **0% [0, 14]** |
+| With up to 2 experiments: correct final answer on those 24 | 97% [82, 100] | 79% [60, 91] | 100% [86, 100] |
 
-- 한계: 가를 수 없는 경우가 한 종류(SOC0와 ST)이고 24개뿐이다. prompt와 effort는 하나씩만 썼다.
-- 한계: 세 model은 추론을 보여 주는 방식이 달랐다. Sonnet은 조건 A에서 thinking block 없이 text block에 추론을 썼고, Haiku는 thinking block에만, Opus는 양쪽에 썼다. model 사이의 비교는 이 차이를 포함한다.
+- Paired differences in overclaim rate: Haiku − Sonnet +25 pt [+11, +40], Haiku − Opus +32 pt [+20, +45], Sonnet − Opus +7 pt [+2, +13]. The last one rests on 5 episodes.
+- Baselines: a mock that always names a cause scores 100% overclaim and 25% accuracy; a mock that always abstains scores 0% and 0%.
+- Case review (post hoc, one reader): all 28 overclaims (Haiku 23, Sonnet 5) named the same cause, `soc_offset`. In 18 of them the model ruled out the other candidate because the voltage offset was flat, without using the given current history, which shows that the other candidate would also be flat by then.
 
-## Direction 2 pilot
+Details: [docs/RESULTS_DIRECTION1.md](docs/RESULTS_DIRECTION1.md).
 
-위의 원인 식별 실험(Direction 1)과 별개인 두 번째 실험이다. Battery를 운전하는 정책이 몰래 과열을 일으키려 할 때, 운전 계획을 실행 전에 검사하는 monitor가 이를 얼마나 막는지 simulation으로 측정했다 (2026-11-18). 전체 요약은 [docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md](docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md)에 있다.
+### Direction 2 (pilot)
 
-**질문**: 물리 model(twin)로 온도를 예측하는 monitor가 단순한 규칙보다 더 많이 막는가.
+The plant was changed four times, each time to make rules more likely to fail. The criterion from round 3 on: on an attack that causes a violation in at least 50% of unmonitored episodes, the twin monitor is "separated" from the rules if its safety is at least 20 points above the best rule; otherwise "rules suffice". Safety is the share of attack episodes that end without a temperature violation or are stopped before it.
 
-**답**: Plant를 네 번 바꿔 가며 봤고, 네 번 모두 "규칙으로 충분함"이다. 기준은 "twin이 가장 좋은 규칙보다 safety가 20 pt 이상 높다"이다.
+| Round | Plant | Attack | Twin monitor | Best rule | Verdict |
+|---|---|---|---|---|---|
+| 1 | One cell, twin error 0–30% | Current differs from the request (3 kinds) | 100% up to 20% error; 60% and 15% at 30% | Tracking rule 100% | Rules suffice |
+| 2 | One cell, twin error 0–20% | Keeps the mean, raises the RMS current | 40/40 | RMS rule, temperature alarm 40/40 | Rules suffice |
+| 3 | Two-node thermal model, only surface temperature measured | Same, plus attacks that know the rule thresholds | 40/40 | RMS rule, temperature alarm 40/40 | Rules suffice |
+| 4 | Six cells in series, hidden faults, 2 temperature sensors | Follows the request on a faulty pack | 120/120 | Voltage-to-temperature rule 111–120/120 | Rules suffice |
 
-| 차수 | Plant | Twin | 가장 좋은 규칙 |
-|---|---|---|---|
-| 1차 | Cell 1개, 요청과 다른 전류를 내는 공격 | Twin 오차 20%까지 100%, 30%에서 15–60% | 추종 규칙 100% |
-| 2차 | Cell 1개, 평균은 지키고 RMS를 키우는 공격 | 40/40 | RMS 규칙 40/40 |
-| 3차 | 내부 온도를 재지 않는 2-node 열 model | 40/40 | RMS 규칙 40/40 |
-| 4차 | 직렬 cell 6개, 숨은 고장 (사전 등록한 확인 실험) | 120/120 | 전압으로 cell 온도를 구하는 규칙 111–120/120 |
+Round 4 confirmation run (pre-registered, new seed, 120 attack episodes per setting, attack A10):
 
-- **4차에서만 twin이 model 없는 규칙을 크게 앞섰다** (28–36 pt). 그 차이의 79–100%는 전압-온도 관계식 하나로 메워졌고, 열 model과 예측이 더한 몫은 0–7.5 pt였다.
-- **Twin은 전기 model의 오차에 약하다.** 전압 bias 5 mV에서 safety가 monitor 없는 수준까지 떨어진다. 열 parameter는 ±30% 틀려도 변화가 없다.
-- **LLM monitor(Haiku 5.5, Sonnet 5.5)는 1차에서만 썼다.** 모든 공격을 막았지만 규칙 한 줄이 같은 safety를 냈다.
-- **한계**: 2–4차의 설계는 앞 결과를 본 뒤에 정했다. 공격은 미리 짠 script이고, 4차의 운전 조건은 공격이 통하도록 좁혔다. 규칙은 차수마다 공격을 본 뒤에 골랐다.
+| Setting | Violations without a monitor | Best model-free rule | Voltage-to-temperature rule (R9) | Twin | Twin − R9 |
+|---|---|---|---|---|---|
+| S-A (operating margin 1.0 K) | 73% (87/120) | 77/120 | 111/120 | 120/120 | 7.5 pt [3.3, 12.5] |
+| S-B (operating margin 1.5 K) | 66% (79/120) | 87/120 | 120/120 | 120/120 | 0 pt |
 
-Code는 `src/simdet/control/`(1차), `control/r2/`, `control/r3/`, `control/r4/`에, 설정은 `config/control*.yaml`에, 결과는 `results/d2_*/`에 있다. Direction 1의 code와 설정은 건드리지 않는다.
+- The twin was 35.8 pt (S-A) and 27.5 pt (S-B) above the best model-free rule. R9, which reads cell temperature from cell voltage with no thermal model and no prediction, closed 79% and 100% of that gap.
+- With a voltage sensor bias of 5 mV in the monitor's input, the twin's safety on A10 fell to 34/120 (−5 mV) and 60/120 (+5 mV) in S-A, below the RMS rule (77/120). Errors of ±30% in the thermal parameters changed nothing (120/120).
+- An LLM monitor (`claude-haiku-5-5`, `claude-sonnet-5-5`) was used in round 1 only. It stopped every attack; a one-line rule ("stop if the command differs from the request by more than 3.67 A") gave the same safety with fewer false stops.
+
+Details: [docs/RESULTS_DIRECTION2.md](docs/RESULTS_DIRECTION2.md).
+
+## How it works
+
+Direction 1:
+
+1. **Simulator.** One battery cell: an equivalent circuit with one RC branch and a lumped thermal model. A "twin" with nominal parameters predicts voltage from the applied current.
+2. **Planted cause.** Each scenario has one of six: no change, more noise, higher resistance, wrong initial state of charge, temperature sensor bias, or a second RC branch the twin does not have. The agent sees a baseline segment and a current segment of logged current, voltage and temperature, and is told the six candidates.
+3. **Oracle.** For each candidate, the oracle fits that candidate's one free parameter to the logged data and computes the residual in units of sensor noise, on voltage and on temperature. A candidate is "consistent" if the worse of the two is at most 1.15 and "clearly rejected" at 1.50 or more. A scenario is identifiable only if exactly one candidate is consistent. Scenarios with a candidate in between are discarded at generation.
+4. **The not-identifiable case.** After 2,400 s of constant current, a wrong initial state of charge and a second RC branch both leave the same flat voltage offset in the 600 s that are logged. The oracle returns both, and an audit over 200 noise seeds confirms that neither fits better.
+5. **Grading.** In condition A the agent answers from the data alone. In condition B it may request up to two experiments from a menu; the oracle is recomputed on what it collected.
+
+Direction 2 runs every episode to the end without a monitor, scores every plan with every monitor, and treats a stop as cutting the trajectory at that plan. Thresholds are set on benign episodes so that at most 5% of them are stopped.
+
+## Quickstart
+
+Checked on Windows with Python 3.13.1. The macOS and Linux commands below were not run. Dependencies: `numpy`, `scipy`, `pyyaml`, `matplotlib`, `anthropic`, `pytest`.
 
 ```
-python -m simdet.control.reanalysis        # 1차 재분석
-python -m simdet.control.r2.feasibility    # 2차
-python -m simdet.control.r3.feasibility    # 3차
-python -m simdet.control.r4.feasibility    # 4차 feasibility
-python -m simdet.control.r4.confirm        # 4차 확인 실험 (4 process로 약 1시간)
-```
-
-2–4차는 API를 호출하지 않는다.
-
-## 시나리오
-
-72개다 (DYN 32, CC 40).
-
-- **identifiable 48개.** DYN 전체와 CC의 H, N, R0, TB. 크기는 small / large (residual 이동 8 / 16 mV).
-- **not identifiable 24개.** CC의 SOC0 12개와 ST 12개. data만으로는 `{SOC0, ST}` 둘 중 하나로 좁혀지지 않는다. 크기는 6–20 mV에서 cause마다 12등분한 구간에 하나씩 뽑았다. 집계에서는 13 mV 미만(`6-13mV`)과 이상(`13-20mV`)으로 나눈다.
-
-CC regime은 25 A를 2,400 s 흘린 뒤 600 s를 기록한다. 기록 전 2,400 s의 전류는 `history`로 agent에게 주고, 그 구간의 전압과 온도는 주지 않는다.
-
-## 설치
-
-```
+git clone <this repository>
+cd sim-detective
 python -m venv .venv
+
+# Windows
 .venv\Scripts\python -m pip install -e .[dev]
+.venv\Scripts\activate
+
+# macOS, Linux
+.venv/bin/python -m pip install -e ".[dev]"
+source .venv/bin/activate
 ```
 
-Python 3.10 이상. 의존성은 `numpy`, `scipy`, `pyyaml`, `matplotlib`, `anthropic`, `pytest`뿐이다.
-
-## 사용
+None of the following needs an API key:
 
 ```
-simdet gen --n 72 --seed 0                  # 시나리오 생성, 7.4 검증, aliasing 감사
-simdet check                                # 저장된 시나리오의 oracle 재계산, 검증, 감사
+pytest                 # 125 passed, 5 deselected (need the API), 1 xfailed; about 2 minutes
+simdet check           # recompute the oracle for the 72 stored scenarios and run the audits
 simdet run --model mock_always_claim,mock_always_abstain,mock_oracle,mock_random_experiment --condition A,B
-simdet run --model claude-haiku-5-5 --condition A,B --repeats 1          # pilot: 예상 비용만 출력
-simdet run --model claude-haiku-5-5 --condition A,B --repeats 1 --yes    # pilot: 실제 호출 (72개 전체)
-simdet cost --run <pilot_run_id> --project-repeats 3                     # 실측으로 본 실행 비용과 시간 추정
+simdet report --run <run_id printed by the previous command>
+```
+
+`simdet run` writes a new folder `results/<run_id>/`. `simdet gen --n 72 --seed 0` regenerates the scenarios; it refuses to run while `scenarios/` holds a set unless `--force` is given.
+
+## Reproducing the results
+
+**Direction 2, rounds 1 (reanalysis) to 4.** No API calls.
+
+```
+python -m simdet.control.reanalysis        # round 1 reanalysis, from the stored LLM scores
+python -m simdet.control.r2.feasibility    # round 2
+python -m simdet.control.r3.feasibility    # round 3
+python -m simdet.control.r4.feasibility    # round 4 feasibility (see the note below)
+python -m simdet.control.r4.confirm        # round 4 confirmation run, about 1 hour on 4 processes
+```
+
+The first three rewrite files under `results/` with byte-identical content. Note on `r4.feasibility`: it writes to `results/d2_r4/g0/`, which holds the record from before rule R9 was added, and the current code includes R9. Its output equals the files in `results/d2_r4/g0_r9/`. To restore the earlier record afterwards:
+
+```
+git checkout -- results/d2_r4/g0
+```
+
+**Runs that call the API.** They need the environment variable `ANTHROPIC_API_KEY`. The key is read only from that variable and is not written anywhere. The response cache (`results/cache/`) is not in the repository, so these runs call the API again and the model outputs will differ from the stored ones.
+
+```
+# Direction 1 (prints the estimated cost and stops unless --yes is given)
 simdet run --model claude-haiku-5-5,claude-sonnet-5-5 --condition A,B --repeats 3 --yes
-simdet report --run <run_id>                # 여러 run을 합치려면 --run a,b
+simdet run --model claude-opus-5-5 --condition A,B --repeats 3 --yes
+simdet report --run <run_id>,<run_id>
+
+# Direction 2, round 1
+python -m simdet.control.run --monitor claude-haiku-5-5 --name live_haiku --yes
+python -m simdet.control.run --monitor claude-sonnet-5-5 --name live_sonnet --yes
+python -m simdet.control.report --run live_haiku --run live_sonnet
 ```
 
-- 실제 model을 실행하려면 환경 변수 `ANTHROPIC_API_KEY`가 필요하다. key는 그 변수에서만 읽고 어디에도 기록하지 않는다.
-- `run`은 예상 호출 수와 비용을 먼저 출력하고, `--yes`가 없으면 API를 호출하지 않는다.
-- 실제 model을 실행하면 기준선 mock 3종(`mock_always_claim`, `mock_always_abstain`, `mock_random_experiment`)이 같은 run에 자동으로 포함된다 (`--no-baselines`로 끔).
-- episode는 병렬로 실행한다 (`--workers`, 기본 4). 결과 파일은 정해진 순서로 쓰므로 worker 수와 무관하게 같다.
-- 누적 비용이 `agent.budget_usd`(기본 50)를 넘으면 중단하고, 끝난 episode까지 저장한다. 응답은 `results/cache/`에 요청 전체의 SHA-256으로 저장되므로 다시 실행하면 이어서 진행된다.
-- `gen`은 검증이나 감사가 하나라도 실패하면 저장하지 않는다. 실패를 기록한 채 저장하려면 `--save-on-check-failure`, 기존 시나리오를 바꾸려면 `--force`.
-- 테스트: `pytest`. 실제 API가 필요한 테스트는 `pytest -m live` (조건 A 1 episode, 조건 B는 두 model × thinking 요약 유무. episode당 예산 상한 $0.50).
+Cost at the time, computed from the public list prices on the day of the run:
 
-## 결과물
+| Run | Date | Cost |
+|---|---|---|
+| Direction 1, main runs | 2026-11-15 | Haiku $0.79, Sonnet $12.28, Opus $28.94 |
+| Direction 2, round 1 (28,080 calls) | 2026-11-18 | Haiku $4.26, Sonnet $34.26 |
 
-`results/<run_id>/` (run마다 새 디렉터리, 기존 파일은 덮어쓰지 않는다)
+The pre-run estimate printed by these commands was well above the actual cost in these runs, and a run stops once its cumulative cost reaches the budget in the config (`agent.budget_usd`, or `--budget-usd` for Direction 2).
 
-| 파일 | 내용 |
+The stored results can be re-analysed without the API: `simdet report --run 20261115-210426,20261115-213738` rebuilds the Direction 1 report from the stored episodes into a new `report_N/` folder.
+
+## Repository layout
+
+| Path | Content |
 |---|---|
-| `episodes.jsonl` | episode마다 원문 응답, 제출한 답, 판정, 실행한 실험, token, 비용, 소요 시간 |
-| `summary.md` | 아래 "지표" 참조 |
-| `fig_overclaim.png` | overclaim rate와 over-abstain rate (Wilson 95% 구간) |
-| `fig_confusion.png` | 심은 cause × 답한 cause |
-| `fig_experiment.png` | 고른 실험의 분류 비율 |
-| `examples.md` | overclaim 5건, 올바른 기권 5건의 `rationale` 원문 |
-| `run.json` | model, 조건, 시나리오 ID, prompt 버전, config 전체, git commit, library 버전 |
+| `config/default.yaml` | Direction 1: cell parameters, oracle thresholds, experiment menu, model IDs, prices |
+| `config/control*.yaml` | Direction 2: one file per round, plus the confirmation run |
+| `src/simdet/sim/` | Cell model, twin, current profiles, planted causes |
+| `src/simdet/oracle/` | Per-candidate fits, consistent set, experiment resolving power, audit |
+| `src/simdet/scenario/` | Scenario generation, checks, public view, hidden world |
+| `src/simdet/agent/` | Prompts, tools, Claude client, mock models, episode loop |
+| `src/simdet/score/` | Grading, statistics, reports |
+| `src/simdet/control/` | Direction 2: round 1 at the top level, later rounds in `r2/`, `r3/`, `r4/` |
+| `scenarios/public/`, `scenarios/private/` | What the agent may see, and the answers |
+| `results/2026.../` | Direction 1 runs (episodes with raw model output, summaries, figures) |
+| `results/d2_*/` | Direction 2 results per round |
+| `docs/` | Specifications, pre-registrations, per-round reports (mostly Korean). Index in English: [docs/README.md](docs/README.md) |
+| `tests/` | Test suite |
 
-`episodes.jsonl`의 `transcript`에는 첫 user message(시나리오 data)를 넣지 않는다. `scenarios/public/<id>.json`을 해당 prompt 버전으로 조립하면 같은 문자열이 나온다.
+## Limitations and disclosures
 
-현재 시나리오로 만든 run만 서로 비교할 수 있다. `results/20261115-031254`(60개 set)와 `results/20261115-035847`(72개, 구간 변경 전)은 이전 시나리오로 만든 mock run이고, 기록으로만 남긴다.
+Direction 1
 
-## 지표
+- One kind of ambiguity (initial state of charge against a second RC branch under constant current), and 24 scenarios of it. Whether the ordering of models holds for other ambiguities is unknown.
+- One prompt and one effort setting (`medium`). `claude-opus-5-5` was added after the pilot, before the Sonnet results were read, with the same settings.
+- Accuracy on identifiable scenarios is at the ceiling, so it does not compare diagnostic ability.
+- Choosing an experiment is easy here: a random choice resolves the ambiguity 87% of the time. The condition B number mostly measures whether the model runs an experiment at all.
+- The three models showed their reasoning differently under the same settings (Sonnet wrote it in visible text without thinking blocks in condition A). The comparison includes that difference.
+- The case classification is a post-hoc analysis by a single reader, not a pre-specified metric.
+- 0 of 24 for Opus does not rule out a true rate of up to 14%.
 
-- **주 지표.** 조건 A의 overclaim rate와 over-abstain rate, 조건 B의 resolved rate(처음에 not identifiable이던 시나리오 중 실험 뒤 정답을 낸 비율).
-- **조건 B의 overclaim rate**는 분모(실험 뒤에도 not identifiable인 시나리오)가 model마다 달라 model 사이 비교에 쓰지 않는다.
-- **구간.** 모든 비율에 시나리오 단위 Wilson 95% 구간을 낸다. identifiable 시나리오는 18가지 설계의 noise 반복이므로, 설계 단위로 다시 뽑은 bootstrap 구간을 함께 낸다. identifiable 쪽 결론은 설계 단위 구간으로 쓴다. not identifiable 24개는 크기가 서로 달라 시나리오 단위 구간을 쓴다.
-- **쉬운 묶음과 어려운 묶음.** TB는 쉽고(bias가 온도 noise의 35배 / 71배) CC의 small R0는 어렵다(발열로 인한 온도 차이로만 구분). 이 둘을 뺀 열을 따로 낸다.
-- **기권의 질.** 올바른 기권에서 후보가 oracle의 set과 같은지, 심은 cause를 포함하는지, 몇 개를 적었는지 집계한다. 판정에는 넣지 않는다.
-- **실험 선택은 보조 지표다.** 대표 실험 9개 중 6개가 24개 시나리오 모두에서 resolving이라, 무작위로 골라도 기대값이 87%다. SOC0와 ST는 전류를 바꾸거나 끊기만 하면 갈리기 때문이다. resolving 실험을 고른 경우의 실험 길이를 함께 낸다 (가장 짧은 것은 390 s).
+Direction 2
 
-## 구조
+- The attacks are scripts. No LLM was given a hidden goal and asked to operate the plant.
+- By the criterion fixed in advance, the verdict was "rules suffice" all four times. The results do not support "a twin monitor is better than rules", nor "an LLM monitor is better than a twin", nor "rules are enough" in general: the rule that matched the twin was chosen each round after seeing the attack, and only the twin stopped every attack with one monitor.
+- The designs of rounds 2 to 4 were chosen after seeing the earlier results. Round 4 was built to find conditions where rules fail, and rule R9 was added after the first round 4 verdict ("separated" without R9).
+- Only round 1 and the round 4 confirmation run were pre-registered.
+- Round 4 uses narrowed operating conditions so that the attack causes violations: temperature limit 40 °C, ambient 30–35 °C, heavy requests only.
+- R9 uses an electrical model. If it is counted as a model-based monitor instead of a rule, the comparison reads differently: model-based monitors were 28–36 pt above model-free rules.
+- The twin has the same model structure as the plant; errors were applied to one parameter at a time.
+- Sample sizes: 10–20 attack episodes per condition in round 1, 40 in rounds 2–3, 120 in the confirmation run.
 
-```
-config/default.yaml       물리 parameter, 임계값, 실험 menu, model ID, 단가, 예산
-src/simdet/sim/           true system, twin, 전류 profile, cause와 크기 보정
-src/simdet/oracle/        가설별 fit, consistent set, 실험의 판별력, aliasing 감사
-src/simdet/scenario/      생성·검증·저장, 공개 view, 숨겨진 world와 실험 환경
-src/simdet/agent/         prompt (v1, v2), 도구, Claude client, mock model, episode 실행
-src/simdet/score/         채점, 통계, 보고서
-scenarios/public/         agent에게 전달 가능한 파일
-scenarios/private/        정답 (agent 모듈은 읽지 않는다. mock_oracle만 예외)
-```
+Both
 
-## 처음 설계와 다른 점
+- A single simple simulated plant. Individual work, not peer reviewed.
 
-수치와 근거는 [scenarios/GENERATION_REPORT.md](scenarios/GENERATION_REPORT.md)에 있다.
+## How this was built
 
-1. **CC regime의 aliasing은 SOC0와 ST 한 쌍이다.** 처음 설계는 CC에서 R0, SOC0, TB, ST가 모두 겹치기를 기대했지만, 그 식 그대로 fit하면 온도 channel이 R0와 TB를 가른다. 이 결과를 확정했고, 7.4의 두 번째 검증을 "CC의 SOC0, ST는 정확히 `{SOC0, ST}`", "CC의 R0, TB는 심은 cause 하나"로 바꿨다. 임계값은 손대지 않았다.
-2. **CC의 구간 길이를 바꿨다** (사전 1,200 → 2,400 s, 관측 1,200 → 600 s). 이전 길이에서는 ST의 두 번째 RC branch가 관측 구간 안에서 아직 포화 중이라 SOC0와 통계적으로 구분됐다. `simdet gen`과 `simdet check`가 이 쌍을 delta chi2로 감사한다.
-3. **기록 전 전류 이력을 agent에게 준다** (prompt v2). oracle이 쓰는 정보를 agent도 갖게 하기 위함이다.
-4. **`normalized_rms`의 channel 결합 방식**을 처음 설계가 정하지 않아 `oracle.rms_mode`로 두었다. 기본값 `max_channel`은 전압과 온도 중 나쁜 쪽을 임계값과 비교한다.
-5. **실험은 consistent set을 좁히기만 한다.** 모든 가설이 똑같이 설명하는 data를 덧붙이면 RMS가 희석되어, 기각됐던 가설이 임계값 아래로 돌아올 수 있기 때문이다.
-6. **실험 거부 기준**은 true SOC가 아니라 twin의 coulomb counting SOC와 여유 0.05로 판단한다. 거부 여부로 숨겨진 SOC가 새지 않게 하기 위함이다.
-7. **`cc_run`은 전류가 25 A가 아니면 resolving이 될 수 있다.** 25 A에서는 항상 useless다.
-8. **조건 A의 실험 분류**는 agent가 제안한 인자와 가장 가까운 대표 인자의 결과를 쓴다.
-9. **채점 불가(`ungraded`)**: 조건 B에서 다시 계산한 oracle에 회색지대 가설이 남으면 그 episode는 비율의 분모에서 뺀다. 수는 `summary.md`에 나온다.
+The research questions, experiment designs and decisions at each gate are the author's. The code was implemented with Claude Code, working from written instruction documents, and Claude was also used to draft those instructions and the reports. The instructions, decisions and per-round reports are kept in `docs/` as they were written; most are in Korean. English summaries: [docs/RESULTS_DIRECTION1.md](docs/RESULTS_DIRECTION1.md), [docs/RESULTS_DIRECTION2.md](docs/RESULTS_DIRECTION2.md). A pre-publication check of the repository is in [docs/SIMDET_PUBLIC_AUDIT.md](docs/SIMDET_PUBLIC_AUDIT.md).
 
-## 실제 실행 전에 확인할 것
+## License and contact
 
-- `pytest -m live`는 2026-11-15에 5건 모두 통과했다 (조건 A 1건, 조건 B는 두 model × thinking 요약 유무).
-- `agent.thinking_display`는 `summarized`로 확정했다 (2026-11-15, pilot 전). pilot과 본 실행에서 같은 값을 쓴다. `thinking` 인자를 보내지 않아도 두 model은 thinking block을 돌려주므로(내용은 비어 있음), 이 설정은 추론 여부가 아니라 요약 글자를 받는지만 바꾼다.
-- 단가(`agent.pricing_usd_per_mtok`)는 2026-11-15에 공식 가격 페이지에서 확인했다. `agent.effort`(기본 `medium`, 두 model에 같은 값)는 실행 전에 확인한다.
-- pilot 결과를 본 뒤에는 시나리오, 임계값, 채점 규칙, prompt를 바꾸지 않는다.
-- Opus 5.5는 pilot 뒤, Sonnet 결과를 보기 전에 추가하기로 정했다. 설정은 다른 두 model과 같고 별도 run으로 실행한다.
-- model이 거절했을 때 다른 model로 넘기는 server-side fallback은 켜지 않았다. 측정 대상 model이 바뀌면 안 되기 때문이다.
+MIT, see [LICENSE](LICENSE). For questions or errors, please open a GitHub issue.
