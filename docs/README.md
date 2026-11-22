@@ -2,10 +2,11 @@
 
 ## Start here
 
-Two English summaries cover the results. Everything else in this folder is in Korean.
+Two English summaries cover the results and one English note describes the model. Everything else in this folder is in Korean.
 
 - [RESULTS_DIRECTION1.md](RESULTS_DIRECTION1.md): Direction 1, cause identification and abstention. Design, results for three models, case classification, limits.
 - [RESULTS_DIRECTION2.md](RESULTS_DIRECTION2.md): Direction 2, twin monitor against rules and an LLM monitor, rounds 1–4. Conclusion, results by round, limits.
+- [MODEL.md](MODEL.md): the battery model, with diagrams. The single cell, and what rounds 3 and 4 of Direction 2 add.
 
 Where an English summary and a Korean original differ, the original holds.
 

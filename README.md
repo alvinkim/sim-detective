@@ -54,6 +54,8 @@ Details: [docs/RESULTS_DIRECTION2.md](docs/RESULTS_DIRECTION2.md).
 
 ## How it works
 
+The battery model behind both directions (equations, parameters and diagrams of the single cell, the two-node thermal model of round 3 and the six-cell pack of round 4) is described in [docs/MODEL.md](docs/MODEL.md).
+
 Direction 1:
 
 1. **Simulator.** One battery cell: an equivalent circuit with one RC branch and a lumped thermal model. A "twin" with nominal parameters predicts voltage from the applied current.

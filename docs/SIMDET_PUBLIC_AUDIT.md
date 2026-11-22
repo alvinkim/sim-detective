@@ -289,6 +289,7 @@ README의 "Repository layout"에 적은 경로도 모두 있다.
 | `README.md` | 그림(`fig_overclaim.png`)은 넣지 않았다. 한 번 넣었다가 commit 전에 뺐다. 그림 파일은 그대로 있다 | 13.3절 |
 | `constraints.txt` (새 파일), `README.md` 85줄 | Test가 통과한 환경의 패키지 버전 34개와 사용법 한 줄 | 설치 시점에 따라 버전이 달라질 수 있다. `pyproject.toml`은 바꾸지 않았다 |
 | `README.md` 153줄 (2026-11-23) | "Repository layout" 표의 `scenarios/` 설명에, `private/`가 agent에게 숨기는 정답이고 비공개 자료가 아니라는 말을 넣었다 | 폴더 이름이 "공개하면 안 되는 자료"로 읽힐 수 있었다 |
+| `docs/MODEL.md` (새 파일), `README.md` 57줄, `docs/README.md` 5, 9줄 (2026-11-23) | Battery model을 영어로 설명하는 문서를 추가하고 두 README에서 링크했다. 수치는 config와 code에서 가져왔고, 결과나 code는 바꾸지 않았다 | README에 model의 식과 도식이 없어, 식별 불가 사례와 4차의 전압-온도 규칙이 왜 성립하는지 알기 어려웠다 |
 
 ### 13.1 정정 문장의 대조
 
