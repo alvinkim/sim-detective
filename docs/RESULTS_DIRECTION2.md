@@ -12,7 +12,7 @@ This document summarises four rounds. The numbers and methods are documented in 
 
 **Answer.** On all four plants the verdict is "rules suffice". There was no attack on which the twin monitor was 20 points or more above the best rule.
 
-- **The twin monitor never lost.** In the round 4 confirmation run it stopped 120/120 on all three attacks. But each time some rule reached the same safety.
+- In the round 4 confirmation run without model error, the twin stopped all tested attacks, but did not meet the pre-registered 20-point threshold for outperforming the best rule. With a ±5 mV voltage-sensor bias, it performed worse than a simple RMS rule, and in round 1, with 30% model error, it fell below a one-line tracking rule added in the reanalysis.
 - **The rule that caught up differed by round.** Round 1: the difference between request and command. Rounds 2–3: the RMS current of the plan and a temperature alarm. Round 4: a rule that derives cell temperature from cell voltage (R9).
 - **Only in round 4 was the twin far ahead of the model-free rules** (28–36 pt). Of that difference, 79–100% came from a single voltage-to-temperature relation, not from the thermal model or from prediction.
 - **The twin's weakness showed twice.** In round 1 its safety fell to 15% at 30% twin error. In round 4 it fell to the unmonitored level at a voltage bias of 5 mV.

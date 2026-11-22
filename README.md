@@ -69,7 +69,7 @@ Direction 2 runs every episode to the end without a monitor, scores every plan w
 Checked on Windows with Python 3.13.1. The macOS and Linux commands below were not run. Dependencies: `numpy`, `scipy`, `pyyaml`, `matplotlib`, `anthropic`, `pytest`.
 
 ```
-git clone <this repository>
+git clone https://github.com/alvinkim/sim-detective.git
 cd sim-detective
 python -m venv .venv
 
@@ -81,6 +81,8 @@ python -m venv .venv
 .venv/bin/python -m pip install -e ".[dev]"
 source .venv/bin/activate
 ```
+
+To install the exact package versions the tests were checked with (Windows, Python 3.13.1), add `-c constraints.txt` to the `pip install` command.
 
 None of the following needs an API key:
 

@@ -273,3 +273,50 @@ README의 "Repository layout"에 적은 경로도 모두 있다.
 | README의 내부 링크 | 10절 |
 | Test | 125 통과, 1 xfail |
 | 실험 결과, config, 사전 등록, 차수별 보고서에 변경 없음 | 8절 |
+
+---
+
+## 13. 공개 후 수정 (2026-11-22, SIMDET-PUBLIC-002)
+
+저장소를 공개한 뒤(`fa204e4`) 외부 검토에서 나온 지적을 고쳤다. 결과 파일, config, code, test, 사전 등록 문서는 바꾸지 않았다. Git 이력도 다시 쓰지 않았으므로, 고치기 전의 문장은 이전 commit에 남아 있다.
+
+| 파일과 줄 | 무엇을 | 왜 |
+|---|---|---|
+| `docs/RESULTS_DIRECTION2.md` 15줄 | "The twin monitor never lost."로 시작하던 항목을, 범위를 좁힌 문장으로 바꿨다 | 같은 문서의 결과와 어긋났다. 1차의 twin 오차 30% 조건과 4차의 전압 bias ±5 mV 조건에서 twin은 규칙보다 낮았다 |
+| `docs/SIMDET_D2_EXPERIMENT_REPORT_FINAL.md` 20–21줄 | 한국어 원문의 같은 항목을 같은 뜻으로 고치고, 바로 아래에 정정 기록 한 줄을 남겼다 | 위와 같다 |
+| `README.md` 72줄 | `git clone`의 placeholder를 실제 주소로 바꿨다 | 그대로 실행하면 실패했다 |
+| `scenarios/GENERATION_REPORT.md` 77줄 | 수기 기록 앞에 영어 안내 한 줄을 추가했다. 기존 기록은 그대로다 | 수기 기록의 초기 설계 수치(식별 불가 12개)와 위쪽 요약의 최종 수치(24개)가 모순으로 읽힐 수 있었다 |
+| `README.md` | 그림(`fig_overclaim.png`)은 넣지 않았다. 한 번 넣었다가 commit 전에 뺐다. 그림 파일은 그대로 있다 | 13.3절 |
+| `constraints.txt` (새 파일), `README.md` 85줄 | Test가 통과한 환경의 패키지 버전 34개와 사용법 한 줄 | 설치 시점에 따라 버전이 달라질 수 있다. `pyproject.toml`은 바꾸지 않았다 |
+
+### 13.1 정정 문장의 대조
+
+| 표현 | 근거 | 결과 |
+|---|---|---|
+| "±5 mV", "worse than a simple RMS rule" | `SIMDET_D2_RESULTS_004.md` 222, 228, 232줄 | A10 safety(120건 중)가 −5 mV에서 twin 34(S-A), 41(S-B), +5 mV에서 60, 64이다. RMS 규칙(R4)은 77, 87이다. 두 부호, 두 설정 모두에서 twin이 낮으므로 "±5 mV"로 썼다 |
+| "30% model error", "one-line tracking rule" | `SIMDET_D2_RESULTS_001.md` 15줄, `SIMDET_D2_REANALYSIS_001.md` 15줄 | Twin 오차 δ = 0.3에서 twin의 safety는 A3 15%(3/20), A2 60%(12/20)이다. 추종 규칙 R1(command와 요청의 차이 3.67 A)은 네 조건의 모든 공격을 막았다. R1은 1차의 사전 등록에 없었고 재분석에서 추가한 규칙이다. 정정 문장에 "added in the reanalysis"(한국어 원문은 "재분석에서 추가한")라고 밝혔다 |
+| "stopped all tested attacks" | `results/d2_r4/confirm/summary.json` | 오차 0에서 twin(M2)은 A9, A4, A10 모두 120/120이다. S-A, S-B 같다 |
+| "pre-registered 20-point threshold" | `SIMDET_D2_PREREG_4.md` 105줄 | A10에서 twin이 가장 좋은 규칙(R9 포함)보다 20 pt 이상 높으면 "분리됨"이다. 실제 차이는 7.5 pt와 0 pt이다 |
+
+원래 항목의 뒤 문장("다만 매번 같은 safety를 내는 규칙이 있었다")은 새 문장과 겹쳐서 뺐다.
+
+### 13.2 같은 표현의 검색
+
+"never lost", "never lose", "한 번도 지지", "지지 않았다"를 `README.md`, `README.ko.md`, `docs/`의 모든 문서에서 찾았다. 위의 두 곳 외에는 없다.
+
+### 13.3 그림의 숫자
+
+- 조건 A의 막대는 README의 표와 같다. Overclaim 32%, 7%, 0%이고 over-abstain 0%, 1%, 0%이다.
+- 그림에는 표에 없는 막대가 있다. 조건 B의 overclaim(Haiku 100%, Sonnet 53%)과 mock 3종이다. 조건 B의 overclaim은 그 model이 실험을 한 뒤에도 식별 불가로 남은 시나리오만 분모로 하므로 model끼리 비교할 수 없다(`report_2/summary.md` 26줄). 처음 읽는 사람이 이 막대를 model 비교로 읽을 수 있어서 그림을 README에 넣지 않았다.
+
+### 13.4 확인
+
+| 항목 | 결과 |
+|---|---|
+| `results/`, `config/`, `src/`, `tests/`, 사전 등록 문서 | 변경 없음 |
+| `scenarios/` | `GENERATION_REPORT.md`에 안내 한 줄과 빈 줄 하나만 추가 |
+| 내부 링크 | `README.md` 9, `README.ko.md` 29, `docs/README.md` 26, 영문 요약 2개씩. 깨진 것 0 |
+| Test | 125 통과, 5 제외, 1 xfail |
+| `constraints.txt` | 새 clone과 새 가상 환경(Windows, Python 3.13.1)에서 `pip install -e .[dev] -c constraints.txt`로 설치해 같은 버전이 깔리는 것과 test 통과를 확인했다 |
+
+패키지 버전은 개발에 쓴 가상 환경의 것이다. 11절의 재현 확인에 쓴 가상 환경은 남아 있지 않아 그 버전과 같은지는 확인하지 못했다.

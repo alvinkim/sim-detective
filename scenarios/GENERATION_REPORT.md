@@ -74,6 +74,8 @@ delta chi2 = fit objective of the wrong candidate minus that of the planted caus
 
 <!-- Notes below this line are written by hand and kept by `simdet gen`. -->
 
+Historical development notes below describe earlier scenario designs. The generated summary above reflects the final 72-scenario evaluation.
+
 ## 수기 기록 (2026-11-15)
 
 ### 1. 7.4의 두 번째 검증이 실패하는 이유
