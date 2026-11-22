@@ -288,6 +288,7 @@ README의 "Repository layout"에 적은 경로도 모두 있다.
 | `scenarios/GENERATION_REPORT.md` 77줄 | 수기 기록 앞에 영어 안내 한 줄을 추가했다. 기존 기록은 그대로다 | 수기 기록의 초기 설계 수치(식별 불가 12개)와 위쪽 요약의 최종 수치(24개)가 모순으로 읽힐 수 있었다 |
 | `README.md` | 그림(`fig_overclaim.png`)은 넣지 않았다. 한 번 넣었다가 commit 전에 뺐다. 그림 파일은 그대로 있다 | 13.3절 |
 | `constraints.txt` (새 파일), `README.md` 85줄 | Test가 통과한 환경의 패키지 버전 34개와 사용법 한 줄 | 설치 시점에 따라 버전이 달라질 수 있다. `pyproject.toml`은 바꾸지 않았다 |
+| `README.md` 153줄 (2026-11-23) | "Repository layout" 표의 `scenarios/` 설명에, `private/`가 agent에게 숨기는 정답이고 비공개 자료가 아니라는 말을 넣었다 | 폴더 이름이 "공개하면 안 되는 자료"로 읽힐 수 있었다 |
 
 ### 13.1 정정 문장의 대조
 

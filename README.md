@@ -150,7 +150,7 @@ The stored results can be re-analysed without the API: `simdet report --run 2026
 | `src/simdet/agent/` | Prompts, tools, Claude client, mock models, episode loop |
 | `src/simdet/score/` | Grading, statistics, reports |
 | `src/simdet/control/` | Direction 2: round 1 at the top level, later rounds in `r2/`, `r3/`, `r4/` |
-| `scenarios/public/`, `scenarios/private/` | What the agent may see, and the answers |
+| `scenarios/public/`, `scenarios/private/` | `public/`: the measurement data the agent is given. `private/`: the answers (planted cause, oracle verdict), read by the grader only. "Private" means hidden from the agent, not confidential; the answers are published here so the grading can be checked |
 | `results/2026.../` | Direction 1 runs (episodes with raw model output, summaries, figures) |
 | `results/d2_*/` | Direction 2 results per round |
 | `docs/` | Specifications, pre-registrations, per-round reports (mostly Korean). Index in English: [docs/README.md](docs/README.md) |
